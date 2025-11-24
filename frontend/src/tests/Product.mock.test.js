@@ -13,8 +13,8 @@ describe("ProductList Component Mock Tests (Read/Add/Delete)", () => {
   });
 
   // SUCCESS CASE
-  test("Hiển thị danh sách sản phẩm khi API trả về dữ liệu", async () => {
-    // Mock dữ liệu trả về
+  test("Hiển thị danh sách sản phẩm khi API trả về dữ liệu ( read)", async () => {
+    // Mock giả lập dữ liệu trả về
     const mockProducts = [
       { id: 1, name: "Laptop Gaming" },
       { id: 2, name: "Chuột không dây" },
@@ -61,7 +61,7 @@ describe("ProductList Component Mock Tests (Read/Add/Delete)", () => {
     ];
 
     productService.getProducts.mockResolvedValue(mockProducts);
-    productService.deleteProduct.mockResolvedValue({}); // mock xóa thành công
+    productService.deleteProduct.mockResolvedValue({}); // mock xóa thành công, be trả về object rỗng
 
     render(
       <MemoryRouter>
@@ -125,6 +125,189 @@ describe("ProductList Component Mock Tests (Read/Add/Delete)", () => {
     expect(screen.getByText("Laptop Gaming")).toBeInTheDocument();
     expect(screen.getByText("Chuột Không Dây")).toBeInTheDocument();
   });
-});
 
-//describe("test");
+  test("thêm sản phẩm thành công", async () => {
+    const mockProduct = {
+      id: 1,
+      name: "Bàn phím cơ blue switch",
+    };
+
+    productService.createProduct.mockResolvedValue(mockProduct);
+
+    // simulate state của form
+    let productState = { id: 1, name: "" };
+    const setProductState = (newValue) => {
+      productState = newValue;
+    };
+
+    const handleSubmit = () => productService.createProduct(productState);
+
+    render(
+      <ProductForm
+        mode="create"
+        nextId={1}
+        product={productState}
+        onChange={setProductState}
+        onCancel={() => {}}
+        onSubmit={handleSubmit}
+      />
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("Nhập tên sản phẩm"), {
+      target: { value: "Bàn phím cơ blue switch" },
+    });
+
+    fireEvent.click(screen.getByText("Thêm"));
+
+    await waitFor(() => {
+      expect(productService.createProduct).toHaveBeenCalledTimes(1);
+    });
+
+    expect(productService.createProduct).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 1,
+        name: "Bàn phím cơ blue switch",
+      })
+    );
+  });
+
+  test("thêm sản phẩm thất bại", async () => {
+    productService.createProduct.mockRejectedValue(new Error("Thêm thất bại"));
+
+    //giả lập state của form
+    let productState = { id: 1, name: "" };
+    const setProductState = (newValue) => {
+      productState = newValue;
+    };
+
+    const handleSubmit = () =>
+      productService.createProduct(productState).catch(() => {});
+
+    render(
+      <ProductForm
+        mode="create"
+        nextId={1}
+        product={productState}
+        onChange={setProductState}
+        onCancel={() => {}}
+        onSubmit={handleSubmit}
+      />
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("Nhập tên sản phẩm"), {
+      target: { value: "Bàn phím cơ blue switch" },
+    });
+    fireEvent.click(screen.getByText("Thêm"));
+    await waitFor(() => {
+      expect(productService.createProduct).toHaveBeenCalledTimes(1);
+    });
+
+    expect(productService.createProduct).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 1,
+        name: "Bàn phím cơ blue switch",
+      })
+    );
+
+    // that bại nên from vẫn còn trên màn hình
+    expect(screen.getByText("Thêm sản phẩm mới")).toBeInTheDocument();
+  });
+
+  test("Sửa sản phẩm thành công", async () => {
+    //giả lập json trả về là sản phẩm với cùng 1 id nhưng tên mới
+    const mockProduct = {
+      id: 1,
+      name: "bàn phím cơ màu đen",
+    };
+
+    productService.updateProduct.mockResolvedValue(mockProduct);
+    let productState = { id: 1, name: "" };
+    const setProductState = (newValue) => {
+      productState = newValue;
+    };
+
+    const handleSubmit = () =>
+      productService.updateProduct(productState.id, productState);
+
+    render(
+      <ProductForm
+        mode="edit"
+        nextId={1}
+        product={productState}
+        onChange={setProductState}
+        onCancel={() => {}}
+        onSubmit={handleSubmit}
+      />
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("Nhập tên sản phẩm"), {
+      target: { value: mockProduct.name },
+    });
+
+    fireEvent.click(screen.getByText("Cập nhật"));
+
+    await waitFor(() => {
+      expect(productService.updateProduct).toHaveBeenCalledTimes(1);
+    });
+
+    expect(productService.updateProduct).toHaveBeenCalledWith(
+      1, // id
+      expect.objectContaining({
+        id: 1,
+        name: "bàn phím cơ màu đen",
+      })
+    );
+  });
+
+  test("cập nhật sản phẩm thất bại", async () => {
+    const mockProduct = {
+      id: 1,
+      name: "Bàn phím cơ blue switch",
+    };
+
+    productService.updateProduct.mockRejectedValue(
+      new Error("Cập nhật thất bại")
+    );
+
+    //giả lập state của form
+    let productState = { id: 1, name: "" };
+    const setProductState = (newValue) => {
+      productState = newValue;
+    };
+
+    const handleSubmit = () =>
+      productService
+        .updateProduct(productState.id, productState)
+        .catch(() => {});
+
+    render(
+      <ProductForm
+        mode="edit"
+        nextId={1}
+        product={productState}
+        onChange={setProductState}
+        onCancel={() => {}}
+        onSubmit={handleSubmit}
+      />
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("Nhập tên sản phẩm"), {
+      target: { value: mockProduct.name },
+    });
+    fireEvent.click(screen.getByText("Cập nhật"));
+    await waitFor(() => {
+      expect(productService.updateProduct).toHaveBeenCalledTimes(1);
+    });
+
+    expect(productService.updateProduct).toHaveBeenCalledWith(
+      mockProduct.id,
+      expect.objectContaining({
+        id: 1,
+        name: "Bàn phím cơ blue switch",
+      })
+    );
+
+    // that bại nên from vẫn còn trên màn hình
+    expect(screen.getByText("Chỉnh sửa sản phẩm")).toBeInTheDocument();
+  });
+});

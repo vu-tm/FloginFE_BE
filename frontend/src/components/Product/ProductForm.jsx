@@ -12,6 +12,10 @@ export default function ProductForm({
   const isCreate = mode === "create";
   const title = isCreate ? "Thêm sản phẩm mới" : "Chỉnh sửa sản phẩm";
   const submitLabel = isCreate ? "Thêm" : "Cập nhật";
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(product);
+  };
 
   return (
     <div className="modal-overlay">
@@ -97,7 +101,7 @@ export default function ProductForm({
           <button onClick={onCancel} className="btn-secondary">
             Hủy
           </button>
-          <button onClick={onSubmit} className="btn-primary">
+          <button onClick={handleSubmit} className="btn-primary">
             {submitLabel}
           </button>
         </div>
