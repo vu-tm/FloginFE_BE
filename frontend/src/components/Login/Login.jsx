@@ -3,6 +3,7 @@ import { Eye, EyeOff, LogIn } from "lucide-react";
 import { useState } from "react";
 import "./LoginPage.css";
 import { validatePassword, validateUsername, } from "../../utils/loginValidation";
+import { loginUser } from "../../services/authService";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -16,9 +17,10 @@ export default function Login() {
       return;
     }
     try {
+      const res = await loginUser(username, password)
       localStorage.setItem("isLoggedIn", "true");
-      window.location.href = "/products";
       alert("Login thanh cong");
+      window.location.href = "/products";
     } catch (err) {
       alert(err.message);
     }
