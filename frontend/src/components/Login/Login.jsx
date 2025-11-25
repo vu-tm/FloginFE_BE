@@ -1,17 +1,12 @@
-import { Eye, EyeOff, LogIn } from "lucide-react"; // Thư viện Icon trạng thái đăng nhập, xuất
+import { Eye, EyeOff, LogIn } from "lucide-react";
 // import { useNavigate } from "react-router-dom"; // Thư viện Thẻ link
 import { useState } from "react";
 import "./LoginPage.css";
-import {
-  validatePassword,
-  validateUsername,
-} from "../../utils/loginValidation";
-import { loginUser } from "../../services/authService";
+import { validatePassword, validateUsername, } from "../../utils/loginValidation";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  // const navigate = useNavigate(); // Ngăn chặn reload lại trang khi gửi form
   const handleLogin = async (e) => {
     e.preventDefault();
     const usernameError = validateUsername(username);
@@ -21,8 +16,6 @@ export default function Login() {
       return;
     }
     try {
-      // Test thử mockito Bài 4 nhưng mà thiếu API làm không được
-      //const result = await loginUser(username, password);
       localStorage.setItem("isLoggedIn", "true");
       window.location.href = "/products";
       alert("Login thanh cong");
@@ -69,6 +62,7 @@ export default function Login() {
                 type="button"
                 className="password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label="show-password"
               >
                 {showPassword ? (
                   <EyeOff className="login-icon-pasword" />
