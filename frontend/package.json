@@ -21,7 +21,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:coverage": "react-scripts test --coverage --watchAll=false",
-    "test:login": "react-scripts test --coverage --watchAll=false --collectCoverageFrom=src/components/Login/Login.jsx --collectCoverageFrom=src/utils/loginValidation.js src/tests/integration/login.integration.test.js"
+    "test:login": "react-scripts test --coverage --watchAll=false --collectCoverageFrom=src/components/Login/Login.jsx --collectCoverageFrom=src/utils/loginValidation.js src/tests/integration/login.integration.test.js",
+    "test:loginMock": "react-scripts test --coverage --watchAll=false --collectCoverageFrom=src/components/Login/Login.jsx src/tests/mock/login.mock.test.js"
   },
   "eslintConfig": {
     "extends": [

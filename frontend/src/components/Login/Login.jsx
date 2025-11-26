@@ -17,10 +17,16 @@ export default function Login() {
       return;
     }
     try {
-      const res = await loginUser(username, password)
-      localStorage.setItem("isLoggedIn", "true");
-      alert("Login thanh cong");
-      window.location.href = "/products";
+      const res = await loginUser(username, password);
+      if (res.success) {
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("authToken", res.token);
+        setUsername(res.username)
+        alert("Login thanh cong");
+        window.location.href = "/products";
+      } else {
+        alert(res.message);
+      }
     } catch (err) {
       alert(err.message);
     }

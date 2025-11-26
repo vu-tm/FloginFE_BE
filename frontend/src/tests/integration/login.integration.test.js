@@ -51,7 +51,7 @@ describe("Login Component - Render", () => {
     })
 })
 
-globalThis.alert = jest.fn(); // mock giả lập alert trong jest
+global.alert = jest.fn(); // mock giả lập alert trong jest
 describe("Login Component - Test form submission và API calls", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -68,9 +68,9 @@ describe("Login Component - Test form submission và API calls", () => {
         fireEvent.click(btnLogin)
         await waitFor(() => {
             expect(mockLogin).toHaveBeenCalledWith("Admin", "123@Cf"); // Kiểm tra có đúng với tham số truyền vào
-            expect(global.alert).toHaveBeenCalledWith("Login thanh cong"); // Ktra alert có được thông báo
-            expect(localStorage.getItem("isLoggedIn")).toBe("true") // Ktra value bên trong localStorage
         })
+        expect(global.alert).toHaveBeenCalledWith("Login thanh cong"); // Ktra alert có được thông báo
+        expect(localStorage.getItem("isLoggedIn")).toBe("true") // Ktra value bên trong localStorage
     });
 
     test("Kiểm tra khi API bị lỗi, alert hiển thị", async () => {
@@ -85,8 +85,8 @@ describe("Login Component - Test form submission và API calls", () => {
         fireEvent.click(btnLogin)
         await waitFor(() => {
             expect(mockLogin).toHaveBeenCalledWith("Admin", "123@Cf");
-            expect(global.alert).toHaveBeenCalledWith("Login failed");
         })
+        expect(global.alert).toHaveBeenCalledWith("Login failed");
     })
 })
 
