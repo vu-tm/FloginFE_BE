@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.Mockito.*;
 
+import java.util.Optional;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -43,7 +45,7 @@ public class AuthServiceTest {
 
         User user = new User("testuser", "hashedPassword", "testuser@example.com");
 
-        when(userRepository.findByUsername(anyString())).thenReturn(user);
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(tokenService.generateToken(any())).thenReturn("mockToken123");
 
@@ -52,6 +54,7 @@ public class AuthServiceTest {
         assertTrue(response.isSuccess());
         assertEquals("Dang nhap thanh cong", response.getMessage());    
         assertNotNull(response.getToken());
+        assertNotNull(response.getUser());
     }
 
     
@@ -63,12 +66,12 @@ public class AuthServiceTest {
             "wronguser", "Pass123"
         );
 
-        when(userRepository.findByUsername(anyString())).thenReturn(null);
+        when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
-        LoginResponse response = authService.authenticate(request);
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> authService.authenticate(request));
+        assertEquals("Khong tim thay username", exception.getMessage());
 
-        assertFalse(response.isSuccess());
-        assertEquals("Khong tim thay username", response.getMessage());
+        verify(tokenService, never()).generateToken(any());
     }
 
     
@@ -82,13 +85,15 @@ public class AuthServiceTest {
 
         User user = new User("username123", "hashedPassword", "username123@gmail.com");
 
-        when(userRepository.findByUsername(anyString())).thenReturn(user);
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
         
-        LoginResponse reponse = authService.authenticate(request);
+        LoginResponse response = authService.authenticate(request);
 
-        assertFalse(reponse.isSuccess());
-        assertEquals("Sai mat khau", reponse.getMessage());
+        assertFalse(response.isSuccess());
+        assertEquals("Sai mat khau", response.getMessage());
+        assertNull(response.getToken());
+        assertNull(response.getUser());
     }
 
     @Test
@@ -103,6 +108,8 @@ public class AuthServiceTest {
 
         assertFalse(response.isSuccess());
         assertEquals("Username bi bo trong", response.getMessage()); 
+        assertNull(response.getToken());
+        assertNull(response.getUser());
     }
 
     @Test
@@ -113,8 +120,11 @@ public class AuthServiceTest {
             "te", "Test123");
             
         LoginResponse response = authService.authenticate(request);
+
         assertFalse(response.isSuccess());
         assertEquals("Do dai username khong hop le", response.getMessage());
+        assertNull(response.getToken());
+        assertNull(response.getUser());
     }
 
     @Test
@@ -125,8 +135,11 @@ public class AuthServiceTest {
             "longusername_for_testing_purposes_exceeding_fifty_chars", "Test123");
 
         LoginResponse response = authService.authenticate(request);
+
         assertFalse(response.isSuccess());
         assertEquals("Do dai username khong hop le", response.getMessage());
+        assertNull(response.getToken());
+        assertNull(response.getUser());
     }
 
     @Test
@@ -141,6 +154,8 @@ public class AuthServiceTest {
         
         assertFalse(response.isSuccess());
         assertEquals("Username chua ki tu khong hop le", response.getMessage());
+        assertNull(response.getToken());
+        assertNull(response.getUser());
     }
 
     @Test
@@ -155,6 +170,8 @@ public class AuthServiceTest {
 
         assertFalse(response.isSuccess());
         assertEquals("Password bi bo trong", response.getMessage());
+        assertNull(response.getToken());
+        assertNull(response.getUser());
     }
 
     @Test
@@ -169,6 +186,8 @@ public class AuthServiceTest {
 
         assertFalse(response.isSuccess());
         assertEquals("Do dai password khong hop le", response.getMessage());
+        assertNull(response.getToken());
+        assertNull(response.getUser());
     }
 
     @Test
@@ -184,6 +203,8 @@ public class AuthServiceTest {
 
         assertFalse(response.isSuccess());
         assertEquals("Do dai password khong hop le", response.getMessage());
+        assertNull(response.getToken());
+        assertNull(response.getUser());
     }
 
     @Test
@@ -198,6 +219,8 @@ public class AuthServiceTest {
         
         assertFalse(response.isSuccess());
         assertEquals("Password phai co ca chu va so", response.getMessage());
+        assertNull(response.getToken());
+        assertNull(response.getUser());
     }
 
     @Test
@@ -212,6 +235,8 @@ public class AuthServiceTest {
         
         assertFalse(response.isSuccess());
         assertEquals("Password phai co ca chu va so", response.getMessage());
+        assertNull(response.getToken());
+        assertNull(response.getUser());
     }
 
     @Test
@@ -226,6 +251,8 @@ public class AuthServiceTest {
          
         assertFalse(response.isSuccess());
         assertEquals("Password chua khoang trang", response.getMessage());
+        assertNull(response.getToken());
+        assertNull(response.getUser());
     }
 
      @Test
@@ -240,5 +267,7 @@ public class AuthServiceTest {
          
         assertFalse(response.isSuccess());
         assertEquals("Username chua ki tu khong hop le", response.getMessage());
+        assertNull(response.getToken());
+        assertNull(response.getUser());
     }
 }
