@@ -1,4 +1,4 @@
-package com.flogin.entity;
+package com.flogin.dto;
 
 public class LoginRequest {
     String username;
