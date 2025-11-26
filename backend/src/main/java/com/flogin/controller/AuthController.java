@@ -1,8 +1,6 @@
 package com.flogin.controller;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +14,7 @@ import com.flogin.service.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:3000") //Chỉ cho phép URL này kêu API
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true") //Chỉ cho phép URL này kêu API
 public class AuthController {
 
     private final AuthService authService;

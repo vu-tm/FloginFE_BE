@@ -4,7 +4,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -356,6 +360,66 @@ public class AuthControllerIntegrationTest {
                     .andExpect(jsonPath("$.token").doesNotExist())
                     .andExpect(jsonPath("$.message").value("Password chua khoang trang"))
                     .andExpect(jsonPath("$.user").doesNotExist());
-                    
+
+    }
+
+    private final String ALLOWED_ORIGIN = "http://localhost:3000";
+    private final String DIS_ALLOWED_ORIGIN = "http://notallowed.com";
+
+    //Test preflight de kiem tra cac cai dat CORS da duoc ghi nhan chua
+    @Test
+    @DisplayName("CORS Test Preflight AllowedOrigin")
+    void testPreflightAllowedOrigin() throws Exception {
+       mockMvc.perform(options("/api/auth/login")
+                .header(HttpHeaders.ORIGIN, ALLOWED_ORIGIN)
+                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST")
+                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, ALLOWED_ORIGIN))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "POST"))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type"))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true"));
+    }
+
+    @Test
+    @DisplayName("CORS Test Preflight DisallowedOrigin")
+    void testPreflightDisallowedOrigin() throws Exception {
+        mockMvc.perform(options("/api/auth/login")
+                .header(HttpHeaders.ORIGIN, DIS_ALLOWED_ORIGIN)
+                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST")
+                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type"))
+                .andExpect(status().isForbidden());
+    }
+
+    //Test POST request voi CORS
+    @Test
+    @DisplayName("POST CORS AllowedOrigin")
+    void testPostAllowedOrigin() throws Exception {
+        when (authService.authenticate(any(LoginRequest.class))).thenReturn(
+            new LoginResponse(true, "Dang nhap thanh cong", "mock-token-123", new UserDto("testuser", "testuser@example.com")
+        ));
+
+        mockMvc.perform(post("/api/auth/login")
+                .header(HttpHeaders.ORIGIN, ALLOWED_ORIGIN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"testuser\",\"password\":\"Test123\"}"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, ALLOWED_ORIGIN));
+    }
+
+    @Test
+    @DisplayName("POST CORS DisallowedOrigin")
+    void testPostDisallowedOrigin() throws Exception {
+        when (authService.authenticate(any(LoginRequest.class))).thenReturn(
+            new LoginResponse(true, "Dang nhap thanh cong", "mock-token-123", new UserDto("testuser", "testuser@example.com")
+        ));
+
+        mockMvc.perform(post("/api/auth/login")
+                .header(HttpHeaders.ORIGIN, DIS_ALLOWED_ORIGIN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"testuser\",\"password\":\"Test123\"}"))
+                .andDo(print())
+                .andExpect(status().isForbidden());
     }
 }
