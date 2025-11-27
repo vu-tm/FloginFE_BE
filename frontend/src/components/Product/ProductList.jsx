@@ -84,7 +84,7 @@ export default function ProductList() {
     setShowCreateModal(false);
     setNewProduct({ name: "", price: "", quantity: "", category: "model" }); // Reset form
 
-    setSuccessMessage('Thêm sản phẩm thành công!')
+    setSuccessMessage('Them san pham thanh cong!')
     setTimeout(() => setSuccessMessage(''), 3000) // Tự động ẩn sau 3s
   };
 

@@ -9,7 +9,7 @@ describe('Product E2E Tests', () => {
         productPage.visit()
     })
 
-    it('should create new product successfully', () => {
+    it('Nen tao san pham moi thanh cong', () => {
         productPage.clickAddNew()
         productPage.fillProductForm({
             name: 'Laptop Dell',
@@ -19,7 +19,7 @@ describe('Product E2E Tests', () => {
         productPage.submitForm()
 
         productPage.getSuccessMessage()
-            .should('contain', 'thành công')
+            .should('contain', 'thanh cong')
         productPage.getProductInList('Laptop Dell')
             .should('exist');
     })
