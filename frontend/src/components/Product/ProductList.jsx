@@ -6,6 +6,7 @@ import ProductForm from "./ProductForm";
 import ProductDetail from "./ProductDetail";
 import * as productService from "../../services/productService";
 export default function ProductList() {
+  const [successMessage, setSuccessMessage] = useState(''); // Thông báo thành công
   const navigate = useNavigate(); // Dùng để chuyển hướng trang (hook)
   const [products, setProducts] = useState([]); // Danh sách sản phẩm
   const [filteredProducts, setFilteredProducts] = useState([]); // Danh sách sản phẩm sau lọc (tạm để trống vì chưa có tìm kiếm)
@@ -82,6 +83,9 @@ export default function ProductList() {
     setProducts([...products, product]); // Thêm vào danh sách hiện ngay dưới bảng
     setShowCreateModal(false);
     setNewProduct({ name: "", price: "", quantity: "", category: "model" }); // Reset form
+
+    setSuccessMessage('Thêm sản phẩm thành công!')
+    setTimeout(() => setSuccessMessage(''), 3000) // Tự động ẩn sau 3s
   };
 
   const handleEditProduct = () => {
@@ -141,6 +145,23 @@ export default function ProductList() {
   return (
     <>
       <div className="container">
+        {successMessage && (
+          <div
+            className="success-message"
+            data-testid="success-message"
+            style={{
+              background: '#d4edda',
+              color: '#155724',
+              padding: '10px',
+              borderRadius: '4px',
+              marginBottom: '15px',
+              border: '1px solid #c3e6cb'
+            }}
+          >
+            {successMessage}
+          </div>
+        )}
+
         {/* Header */}
         <h1 className="title">Quản lý sản phẩm</h1>
         <div className="header">
@@ -148,6 +169,7 @@ export default function ProductList() {
           <button
             onClick={() => setShowCreateModal(true)}
             className="btn-primary"
+            data-testid="add-product-btn"
           >
             <CirclePlus className="icon-small" />
             <span>Thêm sản phẩm</span>
@@ -184,7 +206,7 @@ export default function ProductList() {
               <tbody>
                 {products && products.length > 0 ? (
                   products.map((product) => (
-                    <tr key={product.id} className="table-row-hover">
+                    <tr key={product.id} className="table-row-hover" data-testid="product-item">
                       {/* Mã sản phẩm */}
                       <td>
                         <div className="user-name">

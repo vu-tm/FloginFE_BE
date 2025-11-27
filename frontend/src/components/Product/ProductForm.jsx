@@ -49,6 +49,7 @@ export default function ProductForm({
                 value={product.name}
                 onChange={(e) => onChange({ ...product, name: e.target.value })}
                 className="input"
+                data-testid="product-name"
               />
             </div>
 
@@ -62,6 +63,7 @@ export default function ProductForm({
                   onChange({ ...product, price: e.target.value })
                 }
                 className="input"
+                data-testid="product-price"
               />
             </div>
 
@@ -75,6 +77,7 @@ export default function ProductForm({
                   onChange({ ...product, quantity: e.target.value })
                 }
                 className="input"
+                data-testid="product-quantity"
               />
             </div>
           </div>
@@ -88,6 +91,7 @@ export default function ProductForm({
                   onChange({ ...product, category: e.target.value })
                 }
                 className="input"
+                data-testid="product-category"
               >
                 <option value="electronics">Điện tử</option>
                 <option value="food">Thức ăn</option>
@@ -101,7 +105,7 @@ export default function ProductForm({
           <button onClick={onCancel} className="btn-secondary">
             Hủy
           </button>
-          <button onClick={handleSubmit} className="btn-primary">
+          <button onClick={handleSubmit} className="btn-primary" data-testid="submit-btn">
             {submitLabel}
           </button>
         </div>

@@ -1,4 +1,17 @@
+/**
+* cy.visit(): Cypress mở 1 url cụ thể
+* cy.click: Click phần tử đã chọn
+* cy.get(): chọn phần tử dựa trên selector (class, id, tag…)
+* cy.type(): Nhập text vào input/textarea
+* cy.select(): Chọn giá trị trong dropdown
+* have.value: kiểm tra nội dung trong input/textarea/select
+* cy.should(): xác nhận giá trị của input có đúng văn bản đã nhập hay không
+* cy.contains(): Tìm kiếm phần tử chứa văn bản cụ thể
+* Tìm không thấy thì cypress sẽ tìm liên tục trong 4 giây rồi mới báo lỗi
+**/
+
 class ProductPage {
+
     visit() {
         cy.visit('/products')
     }
@@ -22,8 +35,8 @@ class ProductPage {
     }
 
     getProductInList(name) {
-        return cy.contains('[data - testid="product-item"]', name);
+        return cy.contains('[data-testid="product-item"]', name);
     }
 }
 
-export default ProductPage
+export default ProductPage;

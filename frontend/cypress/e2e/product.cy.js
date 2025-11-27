@@ -4,7 +4,8 @@ describe('Product E2E Tests', () => {
     const productPage = new ProductPage()
 
     beforeEach(() => {
-        cy.login('testuser', 'Test123')
+        cy.login('testuser', 'Test@123')
+        cy.wait(500)
         productPage.visit()
     })
 
@@ -19,5 +20,7 @@ describe('Product E2E Tests', () => {
 
         productPage.getSuccessMessage()
             .should('contain', 'thành công')
+        productPage.getProductInList('Laptop Dell')
+            .should('exist');
     })
 })
