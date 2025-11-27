@@ -133,18 +133,33 @@ export default function ProductList() {
     return map[category] || category;
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("isLoggedIn");
+    navigate("/login");
+  };
   return (
     <>
       <div className="container">
         {/* Header */}
         <h1 className="title">Quản lý sản phẩm</h1>
         <div className="header">
+          {/* Nút Thêm sản phẩm - bên trái */}
           <button
             onClick={() => setShowCreateModal(true)}
             className="btn-primary"
           >
             <CirclePlus className="icon-small" />
             <span>Thêm sản phẩm</span>
+          </button>
+
+          {/* Nút Đăng xuất - bên phải */}
+          <button
+            onClick={handleLogout}
+            className="btn-logout"
+            title="Đăng xuất"
+          >
+            <span className="logout-text">Đăng xuất</span>
           </button>
         </div>
 

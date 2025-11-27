@@ -603,3 +603,40 @@
     background-color: #f3e8ff;
     color: #6b21a8;
 }
+
+/* Nút đăng xuất - góc trên bên phải */
+.btn-logout {
+    background-color: #dc2626;
+    /* đỏ */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    margin-left: auto;
+    /* đẩy sang phải nhất */
+}
+
+.btn-logout:hover {
+    background-color: #b91c1c;
+    transform: translateY(-1px);
+}
+
+.btn-logout .logout-text {
+    /* Ẩn chữ trên mobile nếu muốn gọn hơn */
+}
+
+@media (max-width: 640px) {
+    .btn-logout .logout-text {
+        display: none;
+    }
+
+    .btn-logout {
+        padding: 12px;
+    }
+}
