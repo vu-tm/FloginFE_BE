@@ -6,6 +6,7 @@ import ProductForm from "./ProductForm";
 import ProductDetail from "./ProductDetail";
 import * as productService from "../../services/productService";
 export default function ProductList() {
+  const [successMessage, setSuccessMessage] = useState(''); // Thông báo thành công
   const navigate = useNavigate(); // Dùng để chuyển hướng trang (hook)
   const [products, setProducts] = useState([]); // Danh sách sản phẩm
   const [filteredProducts, setFilteredProducts] = useState([]); // Danh sách sản phẩm sau lọc (tạm để trống vì chưa có tìm kiếm)
@@ -75,6 +76,9 @@ export default function ProductList() {
     setProducts([...products, product]); // Thêm vào danh sách hiện ngay dưới bảng
     setShowCreateModal(false);
     setNewProduct({ name: "", price: "", quantity: "", category: "model" }); // Reset form
+
+    setSuccessMessage('Them san pham thanh cong!')
+    setTimeout(() => setSuccessMessage(''), 3000) // Tự động ẩn sau 3s
   };
 
   const handleEditProduct = () => {
@@ -97,7 +101,7 @@ export default function ProductList() {
   const handleDeleteProduct = async (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
       try {
-        await productService.deleteProduct(id); // gọi API
+        await productService.deleteProduct(id);
         setProducts(products.filter((p) => p.id !== id));
       } catch (error) {
         console.error("Xóa sản phẩm thất bại:", error);
@@ -134,6 +138,23 @@ export default function ProductList() {
   return (
     <>
       <div className="container">
+        {successMessage && (
+          <div
+            className="success-message"
+            data-testid="success-message"
+            style={{
+              background: '#d4edda',
+              color: '#155724',
+              padding: '10px',
+              borderRadius: '4px',
+              marginBottom: '15px',
+              border: '1px solid #c3e6cb'
+            }}
+          >
+            {successMessage}
+          </div>
+        )}
+
         {/* Header */}
         <h1 className="title">Quản lý sản phẩm</h1>
         <div className="header">
@@ -141,6 +162,7 @@ export default function ProductList() {
           <button
             onClick={() => setShowCreateModal(true)}
             className="btn-primary"
+            data-testid="add-product-btn"
           >
             <CirclePlus className="icon-small" />
             <span>Thêm sản phẩm</span>
@@ -177,7 +199,7 @@ export default function ProductList() {
               <tbody>
                 {products && products.length > 0 ? (
                   products.map((product) => (
-                    <tr key={product.id} className="table-row-hover">
+                    <tr key={product.id} className="table-row-hover" data-testid="product-item">
                       {/* Mã sản phẩm */}
                       <td>
                         <div className="user-name">
@@ -280,10 +302,9 @@ export default function ProductList() {
             onCancel={() => setShowEditModal(false)}
             onSubmit={async (updatedProduct) => {
               try {
-                // const saved = await productService.updateProduct(updatedProduct.id, updatedProduct);
-                // setProducts(products.map(p => p.id === saved.id ? saved : p));
+                const saved = await productService.updateProduct(updatedProduct.id, updatedProduct);
+                setProducts(products.map(p => p.id === saved.id ? saved : p));
                 console.log(updatedProduct);
-
                 setShowEditModal(false);
               } catch (err) {
                 alert("Cập nhật thất bại!");

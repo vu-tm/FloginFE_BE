@@ -4,11 +4,12 @@ describe('Product E2E Tests', () => {
     const productPage = new ProductPage()
 
     beforeEach(() => {
-        cy.login('testuser', 'Test123')
+        cy.login('testuser', 'Test@123')
+        cy.wait(500)
         productPage.visit()
     })
 
-    it('should create new product successfully', () => {
+    it('Nen tao san pham moi thanh cong', () => {
         productPage.clickAddNew()
         productPage.fillProductForm({
             name: 'Laptop Dell',
@@ -18,6 +19,8 @@ describe('Product E2E Tests', () => {
         productPage.submitForm()
 
         productPage.getSuccessMessage()
-            .should('contain', 'thành công')
+            .should('contain', 'thanh cong')
+        productPage.getProductInList('Laptop Dell')
+            .should('exist');
     })
 })
