@@ -13,7 +13,7 @@ import com.flogin.dto.LoginResponse;
 import com.flogin.service.AuthService;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true") //Chỉ cho phép URL này kêu API
 public class AuthController {
 
