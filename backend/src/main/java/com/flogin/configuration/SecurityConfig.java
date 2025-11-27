@@ -17,22 +17,23 @@ import com.flogin.service.TokenService;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-    private final JWTTokenFilterService filterService;
-
-    public SecurityConfig(JWTTokenFilterService filterService) {
-        this.filterService = filterService;
+    //Validate token moi khi call api
+    
+    @Bean
+    public JWTTokenFilterService tokenFilterService(TokenService tokenService) {
+        return new JWTTokenFilterService(tokenService);
     }
 
-    //Validate token moi khi call api
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JWTTokenFilterService tokenFilterService) throws Exception {
         http
+                .csrf(csrf -> csrf
+                .disable())
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/api/auth/login").permitAll() //Khong check authorization cho login va h2-console
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()) //Check authorization cac api con lai
-                .addFilterBefore(filterService, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(tokenFilterService, UsernamePasswordAuthenticationFilter.class)
                 .headers(headers -> headers.frameOptions().sameOrigin());
         return http.build();
     }
@@ -42,11 +43,6 @@ public class SecurityConfig {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
-    @Bean
-    public JWTTokenFilterService tokenFilterService(TokenService tokenService) {
-        return new JWTTokenFilterService(tokenService);
-    }
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
