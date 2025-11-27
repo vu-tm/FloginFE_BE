@@ -218,7 +218,7 @@ public class AuthServiceTest {
         LoginResponse response = authService.authenticate(request);
         
         assertFalse(response.isSuccess());
-        assertEquals("Password phai co ca chu va so", response.getMessage());
+        assertEquals("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet", response.getMessage());
         assertNull(response.getToken());
         assertNull(response.getUser());
     }
@@ -234,7 +234,7 @@ public class AuthServiceTest {
         LoginResponse response = authService.authenticate(request);
         
         assertFalse(response.isSuccess());
-        assertEquals("Password phai co ca chu va so", response.getMessage());
+        assertEquals("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet", response.getMessage());
         assertNull(response.getToken());
         assertNull(response.getUser());
     }

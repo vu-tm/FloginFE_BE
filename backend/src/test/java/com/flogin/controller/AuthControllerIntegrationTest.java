@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -275,7 +274,7 @@ public class AuthControllerIntegrationTest {
         LoginRequest request = new LoginRequest("testuser", "Test");
         LoginResponse mockResponse = new LoginResponse(
             false, 
-            "Password phai co ca chu va so", 
+            "Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet", 
             null,
             null
         );
@@ -288,7 +287,7 @@ public class AuthControllerIntegrationTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.success").value(false))
                     .andExpect(jsonPath("$.token").doesNotExist())
-                    .andExpect(jsonPath("$.message").value("Password phai co ca chu va so"))
+                    .andExpect(jsonPath("$.message").value("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet"))
                     .andExpect(jsonPath("$.user").doesNotExist());
     }
 
@@ -298,7 +297,7 @@ public class AuthControllerIntegrationTest {
         LoginRequest request = new LoginRequest("testuser", "1231231");
         LoginResponse mockResponse = new LoginResponse(
             false, 
-            "Password phai co ca chu va so", 
+            "Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet", 
             null,
             null
         );
@@ -311,7 +310,7 @@ public class AuthControllerIntegrationTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.success").value(false))
                     .andExpect(jsonPath("$.token").doesNotExist())
-                    .andExpect(jsonPath("$.message").value("Password phai co ca chu va so"))
+                    .andExpect(jsonPath("$.message").value("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet"))
                     .andExpect(jsonPath("$.user").doesNotExist());
     }
 
@@ -403,7 +402,6 @@ public class AuthControllerIntegrationTest {
                 .header(HttpHeaders.ORIGIN, ALLOWED_ORIGIN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"testuser\",\"password\":\"Test123\"}"))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, ALLOWED_ORIGIN));
     }
@@ -411,15 +409,10 @@ public class AuthControllerIntegrationTest {
     @Test
     @DisplayName("POST CORS DisallowedOrigin")
     void testPostDisallowedOrigin() throws Exception {
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(
-            new LoginResponse(true, "Dang nhap thanh cong", "mock-token-123", new UserDto("testuser", "testuser@example.com")
-        ));
-
         mockMvc.perform(post("/api/auth/login")
                 .header(HttpHeaders.ORIGIN, DIS_ALLOWED_ORIGIN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"testuser\",\"password\":\"Test123\"}"))
-                .andDo(print())
                 .andExpect(status().isForbidden());
     }
 }
