@@ -369,7 +369,7 @@ public class AuthControllerIntegrationTest {
     @Test
     @DisplayName("CORS Test Preflight AllowedOrigin")
     void testPreflightAllowedOrigin() throws Exception {
-       mockMvc.perform(options("/api/auth/login")
+       mockMvc.perform(options("/api/login")
                 .header(HttpHeaders.ORIGIN, ALLOWED_ORIGIN)
                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST")
                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type"))

@@ -1,5 +1,7 @@
 package com.flogin.configuration;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,8 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.CorsConfiguration;
 
 import com.flogin.service.JWTTokenFilterService;
 import com.flogin.service.TokenService;
@@ -27,10 +28,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JWTTokenFilterService tokenFilterService) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(request -> {
+                            CorsConfiguration config = new CorsConfiguration();
+                            config.setAllowedOrigins(List.of("http://localhost:3000")); // frontend origin
+                            config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                            config.setAllowedHeaders(List.of("*"));
+                            return config;
+                        }))
                 .csrf(csrf -> csrf
                 .disable())
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/api/auth/login").permitAll() //Khong check authorization cho login va h2-console
+                        .requestMatchers("/api/login").permitAll() //Khong check authorization cho login va h2-console
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()) //Check authorization cac api con lai
                 .addFilterBefore(tokenFilterService, UsernamePasswordAuthenticationFilter.class)
@@ -43,15 +51,4 @@ public class SecurityConfig {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry)
-            {
-                registry.addMapping("/api/auth").allowedOrigins("http://localhost:3000");
-            }
-        };
-    }
 }
