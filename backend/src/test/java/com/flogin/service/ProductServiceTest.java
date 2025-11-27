@@ -28,8 +28,9 @@ import com.flogin.dto.ProductDto;
 import com.flogin.entity.Product;
 import com.flogin.repository.ProductRepository;
 
+// Mẫu DTO -> Mock Repository -> Gọi Service
 @DisplayName("Product Service Unit Tests")
-public class ProductServiceTests {
+public class ProductServiceTest {
         @Mock // Tạo mock object
         private ProductRepository productRepository;
 
@@ -207,5 +208,41 @@ public class ProductServiceTests {
                 assertEquals("Product not found with id: 999", exception.getMessage());
                 verify(productRepository, times(1)).findById(999L);
                 verify(productRepository, never()).delete(any());
+        }
+
+        @Test
+        @DisplayName("TC9: Lấy tất cả sản phẩm không phân trang")
+        void testGetAllProducts() {
+                List<Product> products = Arrays.asList(
+                                new Product(1L, "Laptop", 15000000, 10, "Electronics"),
+                                new Product(2L, "Mouse", 390000, 40, "Electronics"),
+                                new Product(3L, "Headphones", 1290000, 10, "Electronics"));
+
+                when(productRepository.findAll()).thenReturn(products);
+
+                List<ProductDto> result = productService.getAllProducts();
+
+                // Verify kết quả
+                assertNotNull(result);
+                assertEquals(3, result.size());
+
+                ProductDto firstProduct = result.get(0);
+                assertEquals(1L, firstProduct.getId());
+                assertEquals("Laptop", firstProduct.getName());
+                assertEquals(15000000, firstProduct.getPrice());
+                assertEquals(10, firstProduct.getQuantity());
+                assertEquals("Electronics", firstProduct.getCategory());
+
+                ProductDto secondProduct = result.get(1);
+                assertEquals(2L, secondProduct.getId());
+                assertEquals("Mouse", secondProduct.getName());
+                assertEquals(390000, secondProduct.getPrice());
+
+                ProductDto thirdProduct = result.get(2);
+                assertEquals(3L, thirdProduct.getId());
+                assertEquals("Headphones", thirdProduct.getName());
+
+                // Verify repository được gọi đúng 1 lần
+                verify(productRepository, times(1)).findAll();
         }
 }

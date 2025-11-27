@@ -59,7 +59,7 @@ public class ProductController {
 
         // ========================================================================
         // ResponseEntity<T> response = new ResponseEntity<>(body, headers, status);
-        // Status code: 200 = OK, 201 = CREATED, 404 = NOT FOUND
+        // Status code: 200 = OK, 201 = CREATED, 404 = NOT FOUND, 400 = BAD REQUEST,
         // 204 = NO CONTENT(Request successful, no response body)
         // @RequestBody -> Post / Put
         // ========================================================================
@@ -99,7 +99,7 @@ public class ProductController {
 
         // // READ ALL - Lấy tât cả sản phẩm với phân trang
         // @GetMapping("/paged")
-        // public ResponseEntity<List<ProductDto>> getAllProductsWithPagination()
+        // public ResponseEntity<Page<ProductDto>> getAllProductsWithPagination(
         // @RequestParam(defaultValue = "0") int page,
         // @RequestParam(defaultValue = "10") int size) {
         // return new ResponseEntity<>(productService.getAllProductsWithPagination(page,

@@ -3,6 +3,7 @@ package com.flogin.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*; // import get, post, put, delete
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*; // import status, content, jsonPath
@@ -18,22 +19,37 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
 import com.flogin.dto.ProductDto;
 import com.flogin.service.ProductService;
 
+// Mẫu DTO -> Mock Service -> Gọi Http endpoint
+@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(ProductController.class) // Chỉ load tầng Controller
 @DisplayName("Product API Integration Test")
 public class ProductControllerIntegrationTest {
         @Autowired
-        private MockMvc mockMvc;
+        private MockMvc mockMvc; // Giả lập Http request
 
         @MockBean
         private ProductService productService;
 
-        @Test
+        // ======================jsonPath======================== //
+        // $: toàn bộ object
+        // $.id: id của object ..., tương tự với các thuộc tính khác
+        // $[0]: object đầu tiên trong mảng
+        // .hasSize(): kiểm tra kích thước
+        // .value(): kiểm tra gtri
+        // .exists(): kiểm tra tồn tại
+        // .isArray() / .isString() / .isNumber(): Kiểm tra kiểu dữ liệu
+        // .isEmpty(): kiểm tra rỗng
+        // ====================================================== //
+
+        @Test // a
         @DisplayName("GET /api/products - Lấy danh sách sản phẩm")
         // Viết test cho web layer phải throws Exception
+        // mockMvc.perform(...) trả về ResultActions
         void testGetAllProducts() throws Exception {
                 // GIVEN
                 List<ProductDto> products = Arrays.asList(
@@ -47,11 +63,11 @@ public class ProductControllerIntegrationTest {
                                 .andExpect(jsonPath("$", hasSize(2)))
                                 .andExpect(jsonPath("$[0].name").value("Laptop"))
                                 .andExpect(jsonPath("$[1].name").value("Mouse"))
-                                .andExpect(jsonPath("$[0].price").value("15000000"))
-                                .andExpect(jsonPath("$[1].price").value("390000"));
+                                .andExpect(jsonPath("$[0].price").value(15000000))
+                                .andExpect(jsonPath("$[1].price").value(390000));
         }
 
-        @Test
+        @Test // b
         @DisplayName("GET /api/products/{id} - Lấy sản phẩm theo ID")
         void testGetProductById() throws Exception {
                 // GIVEN
@@ -68,7 +84,7 @@ public class ProductControllerIntegrationTest {
                                 .andExpect(jsonPath("$.category").value("Electronics"));
         }
 
-        @Test
+        @Test // c
         @DisplayName("POST /api/products - Tạo sản phẩm mới")
         void testCreateProduct() throws Exception {
                 // GIVEN
@@ -97,7 +113,7 @@ public class ProductControllerIntegrationTest {
                                 .andExpect(jsonPath("$.category").value("Electronics"));
         }
 
-        @Test
+        @Test // d
         @DisplayName("PUT /api/products/{id} - Cập nhật sản phẩm thành công")
         void testUpdateProduct() throws Exception {
                 // GIVEN
@@ -125,7 +141,7 @@ public class ProductControllerIntegrationTest {
                                 .andExpect(jsonPath("$.category").value("Electronics"));
         }
 
-        @Test
+        @Test // e
         @DisplayName("DELETE /api/products/{id} - Xóa sản phẩm thành công")
         void testDeleteProduct() throws Exception {
                 // GIVEN
