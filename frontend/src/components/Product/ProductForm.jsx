@@ -1,25 +1,61 @@
 import { X } from "lucide-react";
-import "./ProductList.css"; // Giữ nguyên style cũ
+import { useState } from "react";
+import "./ProductList.css";
 
 export default function ProductForm({
-  mode, // 'create' hoặc 'edit'
-  product, // dữ liệu hiện tại (newProduct hoặc editingProduct)
-  onChange, // hàm setState
-  onCancel, // click nút Hủy
-  onSubmit, // click nút Thêm / Cập nhật
-  nextId, // ID kế tiếp (chỉ dùng khi create)
+  mode,           // 'create' | 'edit'
+  initialProduct, // dữ liệu ban đầu (khi edit) hoặc {} khi create
+  onCancel,
+  onSubmit,       // nhận vào object product đã đúng định dạng
+  nextId,         // chỉ dùng khi create để hiển thị mã SP-xxx
 }) {
   const isCreate = mode === "create";
-  const title = isCreate ? "Thêm sản phẩm mới" : "Chỉnh sửa sản phẩm";
-  const submitLabel = isCreate ? "Thêm" : "Cập nhật";
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(product);
+
+  const [formData, setFormData] = useState({
+    name: initialProduct?.name || "",
+    price: initialProduct?.price || "",
+    quantity: initialProduct?.quantity || "",
+    category: initialProduct?.category || "model",
+  });
+
+  const handleChange = (field) => (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const submittedProduct = {
+      // id sẽ do backend sinh hoặc bạn truyền nextId khi create (nếu cần hiển thị tạm)
+      ...(isCreate ? {} : { id: initialProduct.id }),
+      name: formData.name.trim(),
+      price: Number(formData.price) || 0,
+      quantity: Number(formData.quantity) || 0,
+      category: formData.category,
+    };
+
+    // Gọi callback từ cha (ProductList) để xử lý tiếp (gọi API hoặc cập nhật state)
+    onSubmit(submittedProduct);
+
+    // Nếu là create → reset form
+    if (isCreate) {
+      setFormData({
+        name: "",
+        price: "",
+        quantity: "",
+        category: "model",
+      });
+    }
+  };
+
+  const title = isCreate ? "Thêm sản phẩm mới" : "Chỉnh sửa sản phẩm";
+  const submitLabel = isCreate ? "Thêm" : "Cập nhật";
+
   return (
-    <div className="modal-overlay">
-      <div className="modal">
+    <div className="modal-overlay" onClick={onCancel}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">{title}</h3>
           <button onClick={onCancel} className="btn-close">
@@ -27,84 +63,86 @@ export default function ProductForm({
           </button>
         </div>
 
-        <div className="modal-body">
-          <div className="form-grid">
-            <div>
-              <label>Mã sản phẩm</label>
-              <input
-                type="text"
-                value={`SP-${(isCreate ? nextId : product.id)
-                  .toString()
-                  .padStart(3, "0")}`}
-                disabled
-                className="input"
-              />
+        <form onSubmit={handleSubmit}>
+          <div className="modal-body">
+            <div className="form-grid">
+              <div>
+                <label>Mã sản phẩm</label>
+                <input
+                  type="text"
+                  value={`SP-${(isCreate ? nextId : initialProduct?.id || "")
+                    .toString()
+                    .padStart(3, "0")}`}
+                  disabled
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Tên sản phẩm *</label>
+                <input
+                  type="text"
+                  placeholder="Nhập tên sản phẩm"
+                  value={formData.name}
+                  onChange={handleChange("name")}
+                  className="input"
+                  required
+                />
+              </div>
+
+              <div>
+                <label>Giá *</label>
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Nhập giá"
+                  value={formData.price}
+                  onChange={handleChange("price")}
+                  className="input"
+                  required
+                />
+              </div>
+
+              <div>
+                <label>Số lượng *</label>
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Nhập số lượng"
+                  value={formData.quantity}
+                  onChange={handleChange("quantity")}
+                  className="input"
+                  required
+                />
+              </div>
             </div>
 
-            <div>
-              <label>Tên sản phẩm *</label>
-              <input
-                type="text"
-                placeholder="Nhập tên sản phẩm"
-                value={product.name}
-                onChange={(e) => onChange({ ...product, name: e.target.value })}
-                className="input"
-              />
-            </div>
-
-            <div>
-              <label>Giá *</label>
-              <input
-                type="number"
-                placeholder="Nhập giá"
-                value={product.price}
-                onChange={(e) =>
-                  onChange({ ...product, price: e.target.value })
-                }
-                className="input"
-              />
-            </div>
-
-            <div>
-              <label>Số lượng *</label>
-              <input
-                type="number"
-                placeholder="Nhập số lượng"
-                value={product.quantity}
-                onChange={(e) =>
-                  onChange({ ...product, quantity: e.target.value })
-                }
-                className="input"
-              />
+            <div className="form-grid">
+              <div>
+                <label>Loại *</label>
+                <select
+                  value={formData.category}
+                  onChange={handleChange("category")}
+                  className="input"
+                  required
+                >
+                  <option value="electronics">Điện tử</option>
+                  <option value="food">Thức ăn</option>
+                  <option value="model">Mô hình</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <div className="form-grid">
-            <div>
-              <label>Loại *</label>
-              <select
-                value={product.category}
-                onChange={(e) =>
-                  onChange({ ...product, category: e.target.value })
-                }
-                className="input"
-              >
-                <option value="electronics">Điện tử</option>
-                <option value="food">Thức ăn</option>
-                <option value="model">Mô hình</option>
-              </select>
-            </div>
+          <div className="modal-footer">
+            <button type="button" onClick={onCancel} className="btn-secondary">
+              Hủy
+            </button>
+            <button type="submit" className="btn-primary">
+              {submitLabel}
+            </button>
           </div>
-        </div>
-
-        <div className="modal-footer">
-          <button onClick={onCancel} className="btn-secondary">
-            Hủy
-          </button>
-          <button onClick={handleSubmit} className="btn-primary">
-            {submitLabel}
-          </button>
-        </div>
+        </form>
       </div>
     </div>
   );

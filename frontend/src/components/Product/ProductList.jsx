@@ -25,39 +25,33 @@ export default function ProductList() {
   const demoProducts = [
     {
       id: 1,
-      name: "Tai nghe Bluetooth Sony WH-CH520",
+      name: "Tai nghe BluH-CH520",
       price: 1290000,
       quantity: 10,
       category: "electronics",
     },
     {
       id: 2,
-      name: "Snack khoai tây Lay’s vị BBQ",
+      name: "Snack ",
       price: 18000,
       quantity: 120,
       category: "food",
     },
     {
       id: 3,
-      name: "Mô hình Gundam RX-78-2 HG 1/144",
+      name: "Mô hình Gu-2 HG 1/144",
       price: 499000,
       quantity: 15,
       category: "model",
     },
     {
       id: 4,
-      name: "Chuột Logitech M331 Silent Plus",
+      name: "Chuột Logitech Ment Plus",
       price: 390000,
       quantity: 40,
       category: "electronics",
     },
   ];
-
-  useEffect(() => {
-    // Nạp giả lập dữ liệu
-    setProducts(demoProducts);
-    setFilteredProducts(demoProducts);
-  }, []);
   //khi test cho api
   useEffect(() => {
     async function fetchData() {
@@ -71,8 +65,7 @@ export default function ProductList() {
     }
     fetchData();
   }, []);
-  const handleCreateProduct = () => {
-    // Hàm handle khi tạo sản phẩm
+  const handleCreateProduct = async () => {
     const product = {
       id: products.length + 1,
       ...newProduct,
@@ -261,30 +254,44 @@ export default function ProductList() {
           </div>
         </div>
 
-        {/* Modal thêm sản phẩm */}
         {showCreateModal && (
           <ProductForm
             mode="create"
-            product={newProduct}
-            onChange={setNewProduct}
-            onCancel={() => setShowCreateModal(false)}
-            onSubmit={handleCreateProduct}
+            initialProduct={{}}
             nextId={products.length + 1}
+            onCancel={() => setShowCreateModal(false)}
+            onSubmit={async (product) => {
+              try {
+                console.log(product);
+                const newProductFromApi = await productService.createProduct(product);
+                setProducts([...products, newProductFromApi]);
+                setShowCreateModal(false);
+              } catch (err) {
+                alert("Thêm thất bại!");
+              }
+            }}
           />
         )}
 
-        {/* Modal sửa sản phẩm */}
         {showEditModal && editingProduct && (
           <ProductForm
             mode="edit"
-            product={editingProduct}
-            onChange={setEditingProduct}
+            initialProduct={editingProduct}
             onCancel={() => setShowEditModal(false)}
-            onSubmit={handleEditProduct}
+            onSubmit={async (updatedProduct) => {
+              try {
+                // const saved = await productService.updateProduct(updatedProduct.id, updatedProduct);
+                // setProducts(products.map(p => p.id === saved.id ? saved : p));
+                console.log(updatedProduct);
+
+                setShowEditModal(false);
+              } catch (err) {
+                alert("Cập nhật thất bại!");
+              }
+            }}
           />
         )}
 
-        {/* Modal xem chi tiết – màu sắc & bố cục khác */}
         {showDetailModal && detailProduct && (
           <ProductDetail
             product={detailProduct}
