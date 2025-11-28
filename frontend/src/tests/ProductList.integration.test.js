@@ -39,7 +39,7 @@ describe("ProductList - Integration Test với API mock", () => {
       </MemoryRouter>
     );
 
-    // Dùng findByText thay vì getByText vì dữ liệu là async
+    // Dùng findByText
     expect(
       await screen.findByText("Tai nghe Bluetooth Sony WH-CH520")
     ).toBeInTheDocument();
@@ -53,7 +53,6 @@ describe("ProductList - Integration Test với API mock", () => {
   });
 
   test("Hiển thị thông báo khi API thất bại", async () => {
-    // Lỗi 1: Bạn viết sai tên mock → SỬA THÀNH getProducts
     getProducts.mockRejectedValue(new Error("Network Error"));
 
     render(
@@ -62,7 +61,7 @@ describe("ProductList - Integration Test với API mock", () => {
       </MemoryRouter>
     );
 
-    // Dùng waitFor + findByText vì component render async
+    // Dùng waitFor + findByText
     await waitFor(async () => {
       expect(
         await screen.findByText(/không có sản phẩm|lỗi|không tải được/i)
@@ -70,7 +69,7 @@ describe("ProductList - Integration Test với API mock", () => {
     });
   });
 
-  // Bonus: Test loading state (thầy rất thích thấy cái này)
+  // Bonus: Test loading state
   test("Hiển thị loading khi đang gọi API", () => {
     getProducts.mockReturnValue(new Promise(() => {})); // pending forever
 
