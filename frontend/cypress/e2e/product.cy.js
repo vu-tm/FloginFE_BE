@@ -5,7 +5,7 @@ describe('Product E2E Tests', () => {
 
     beforeEach(() => {
         cy.login('testuser', 'Test@123')
-        cy.wait(500)
+        cy.wait(1000)
         productPage.visit()
     })
 
