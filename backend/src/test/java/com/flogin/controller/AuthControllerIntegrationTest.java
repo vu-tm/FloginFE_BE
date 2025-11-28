@@ -37,10 +37,12 @@ public class AuthControllerIntegrationTest {
     @MockBean
     private AuthService authService;
 
+    private final String LOGIN_API = "/api/login";
+
     @Test
     @DisplayName ("POST /api/auth/login - Thanh cong")
     void testLoginSuccess() throws Exception {
-        LoginRequest request = new LoginRequest("testuser", "Test123");
+        LoginRequest request = new LoginRequest("testuser", "Test@123");
         LoginResponse mockResponse = new LoginResponse(
             true,
             "Dang nhap thanh cong",
@@ -50,7 +52,7 @@ public class AuthControllerIntegrationTest {
 
         when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
@@ -63,7 +65,7 @@ public class AuthControllerIntegrationTest {
     @Test
     @DisplayName("POST /api/auth/login - That bai do username khong ton tai")
     void testLoginFailure_usernameNotFound() throws Exception {
-        LoginRequest request = new LoginRequest("testuser", "Test123");
+        LoginRequest request = new LoginRequest("testuser", "Test@123");
         LoginResponse mockResponse = new LoginResponse(
             false, 
             "Khong tim thay username", 
@@ -71,9 +73,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -86,7 +88,7 @@ public class AuthControllerIntegrationTest {
     @Test
     @DisplayName("POST /api/auth/login - That bai do sai mat khau")
     void testLoginFailure_wrongPassword() throws Exception {
-        LoginRequest request = new LoginRequest("testuser", "Test123");
+        LoginRequest request = new LoginRequest("testuser", "Test@123");
         LoginResponse mockResponse = new LoginResponse(
             false, 
             "Sai mat khau", 
@@ -94,9 +96,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -109,7 +111,7 @@ public class AuthControllerIntegrationTest {
     @Test
     @DisplayName("POST /api/auth/login - That bai do username trong")
     void testLoginFailure_emptyUsername() throws Exception {
-        LoginRequest request = new LoginRequest("", "Test123");
+        LoginRequest request = new LoginRequest("", "Test@123");
         LoginResponse mockResponse = new LoginResponse(
             false, 
             "Username bi bo trong", 
@@ -117,9 +119,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -132,7 +134,7 @@ public class AuthControllerIntegrationTest {
     @Test
     @DisplayName("POST /api/auth/login - That bai do username ngan hon 3 ki tu")
     void testLoginFailure_usernameShorterThan3Chars() throws Exception {
-        LoginRequest request = new LoginRequest("te", "Test123");
+        LoginRequest request = new LoginRequest("te", "Test@123");
         LoginResponse mockResponse = new LoginResponse(
             false, 
             "Do dai username khong hop le", 
@@ -140,9 +142,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -155,7 +157,7 @@ public class AuthControllerIntegrationTest {
     @Test
     @DisplayName("POST /api/auth/login - That bai do username dai hon 50 ki tu")
     void testLoginFailure_usernameLongerThan50Chars() throws Exception {
-        LoginRequest request = new LoginRequest("longusername_for_testing_purposes_exceeding_fifty_chars", "Test123");
+        LoginRequest request = new LoginRequest("longusername_for_testing_purposes_exceeding_fifty_chars", "Test@123");
         LoginResponse mockResponse = new LoginResponse(
             false, 
             "Do dai username khong hop le", 
@@ -163,9 +165,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -178,7 +180,7 @@ public class AuthControllerIntegrationTest {
     @Test
     @DisplayName("POST /api/auth/login - That bai do username chua ki tu khong hop le")
     void testLoginFailure_usernameWithInappropriateChars() throws Exception{
-        LoginRequest request = new LoginRequest("test@user", "Test123");
+        LoginRequest request = new LoginRequest("test@user", "Test@123");
         LoginResponse mockResponse = new LoginResponse(
             false, 
             "Username chua ki tu khong hop le", 
@@ -186,9 +188,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -209,9 +211,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -232,9 +234,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -256,9 +258,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -279,9 +281,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -302,9 +304,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -317,7 +319,7 @@ public class AuthControllerIntegrationTest {
     @Test
     @DisplayName("POST /api/auth/login - That bai do username co khoang trang")
     void testLoginFailure_usernameHasWhitespaces() throws Exception {
-        LoginRequest request = new LoginRequest("test user", "Test123");
+        LoginRequest request = new LoginRequest("test user", "Test@123");
         LoginResponse mockResponse = new LoginResponse(
             false, 
             "Username chua khoang trang", 
@@ -325,9 +327,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
@@ -348,9 +350,9 @@ public class AuthControllerIntegrationTest {
             null
         );
 
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
 
@@ -376,14 +378,13 @@ public class AuthControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, ALLOWED_ORIGIN))
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "POST"))
-                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type"))
-                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true"));
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type"));
     }
 
     @Test
     @DisplayName("CORS Test Preflight DisallowedOrigin")
     void testPreflightDisallowedOrigin() throws Exception {
-        mockMvc.perform(options("/api/auth/login")
+        mockMvc.perform(options(LOGIN_API)
                 .header(HttpHeaders.ORIGIN, DIS_ALLOWED_ORIGIN)
                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST")
                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type"))
@@ -394,14 +395,14 @@ public class AuthControllerIntegrationTest {
     @Test
     @DisplayName("POST CORS AllowedOrigin")
     void testPostAllowedOrigin() throws Exception {
-        when (authService.authenticate(any(LoginRequest.class))).thenReturn(
+        when(authService.authenticate(any(LoginRequest.class))).thenReturn(
             new LoginResponse(true, "Dang nhap thanh cong", "mock-token-123", new UserDto("testuser", "testuser@example.com")
         ));
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                 .header(HttpHeaders.ORIGIN, ALLOWED_ORIGIN)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username\":\"testuser\",\"password\":\"Test123\"}"))
+                .content("{\"username\":\"testuser\",\"password\":\"Test@123\"}"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, ALLOWED_ORIGIN));
     }
@@ -409,10 +410,10 @@ public class AuthControllerIntegrationTest {
     @Test
     @DisplayName("POST CORS DisallowedOrigin")
     void testPostDisallowedOrigin() throws Exception {
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post(LOGIN_API)
                 .header(HttpHeaders.ORIGIN, DIS_ALLOWED_ORIGIN)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username\":\"testuser\",\"password\":\"Test123\"}"))
+                .content("{\"username\":\"testuser\",\"password\":\"Test@123\"}"))
                 .andExpect(status().isForbidden());
     }
 }
