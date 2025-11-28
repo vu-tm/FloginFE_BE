@@ -87,6 +87,7 @@ export default function ProductForm({
                   onChange={handleChange("name")}
                   className="input"
                   required
+                  data-testid="product-name"
                 />
               </div>
 
@@ -100,6 +101,7 @@ export default function ProductForm({
                   onChange={handleChange("price")}
                   className="input"
                   required
+                  data-testid="product-price"
                 />
               </div>
 
@@ -113,6 +115,7 @@ export default function ProductForm({
                   onChange={handleChange("quantity")}
                   className="input"
                   required
+                  data-testid="product-quantity"
                 />
               </div>
             </div>
@@ -138,7 +141,7 @@ export default function ProductForm({
             <button type="button" onClick={onCancel} className="btn-secondary">
               Hủy
             </button>
-            <button type="submit" className="btn-primary">
+            <button type="submit" className="btn-primary" data-testid="submit-btn">
               {submitLabel}
             </button>
           </div>

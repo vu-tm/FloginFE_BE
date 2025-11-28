@@ -24,12 +24,6 @@
     "test:login": "react-scripts test --coverage --watchAll=false --collectCoverageFrom=src/components/Login/Login.jsx --collectCoverageFrom=src/utils/loginValidation.js src/tests/integration/login.integration.test.js",
     "test:loginMock": "react-scripts test --coverage --watchAll=false --collectCoverageFrom=src/components/Login/Login.jsx src/tests/mock/login.mock.test.js"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -60,7 +54,6 @@
     "cypress": "^15.7.0",
     "eslint": "^8.0.0",
     "eslint-config-react-app": "^7.0.1",
-    "eslint-plugin-cypress": "^5.2.0",
     "eslint-plugin-import": "^2.25.0",
     "eslint-plugin-jsx-a11y": "^6.5.0",
     "eslint-plugin-react": "^7.32.0",

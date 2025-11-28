@@ -19,7 +19,7 @@ describe('Product E2E Tests', () => {
         productPage.submitForm()
 
         productPage.getSuccessMessage()
-            .should('contain', 'thanh cong')
+            .should('contain', 'thành công')
         productPage.getProductInList('Laptop Dell')
             .should('exist');
     })

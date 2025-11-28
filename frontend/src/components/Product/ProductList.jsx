@@ -66,6 +66,7 @@ export default function ProductList() {
     }
     fetchData();
   }, []);
+
   const handleCreateProduct = async () => {
     const product = {
       id: products.length + 1,
@@ -76,9 +77,16 @@ export default function ProductList() {
     setProducts([...products, product]); // Thêm vào danh sách hiện ngay dưới bảng
     setShowCreateModal(false);
     setNewProduct({ name: "", price: "", quantity: "", category: "model" }); // Reset form
+  };
 
-    setSuccessMessage('Them san pham thanh cong!')
-    setTimeout(() => setSuccessMessage(''), 3000) // Tự động ẩn sau 3s
+  const showAlert = (message, type = 'success') => {
+    if (type === 'success') {
+      setSuccessMessage(message);
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } else {
+      // Xử lý cho trường hợp error
+      alert(message);
+    }
   };
 
   const handleEditProduct = () => {
@@ -103,8 +111,10 @@ export default function ProductList() {
       try {
         await productService.deleteProduct(id);
         setProducts(products.filter((p) => p.id !== id));
+        showAlert('Xóa sản phẩm thành công!');
       } catch (error) {
         console.error("Xóa sản phẩm thất bại:", error);
+        showAlert('Xóa sản phẩm thất bại!', 'error');
       }
     }
   };
@@ -194,7 +204,6 @@ export default function ProductList() {
                 </tr>
               </thead>
 
-              {/* Body bảng */}
               {/* Body bảng */}
               <tbody>
                 {products && products.length > 0 ? (
@@ -288,8 +297,9 @@ export default function ProductList() {
                 const newProductFromApi = await productService.createProduct(product);
                 setProducts([...products, newProductFromApi]);
                 setShowCreateModal(false);
+                showAlert('Thêm sản phẩm thành công');
               } catch (err) {
-                alert("Thêm thất bại!");
+                showAlert('Thêm sản phẩm thất bại', 'error');
               }
             }}
           />
@@ -306,8 +316,9 @@ export default function ProductList() {
                 setProducts(products.map(p => p.id === saved.id ? saved : p));
                 console.log(updatedProduct);
                 setShowEditModal(false);
+                showAlert('Cập nhật sản phẩm thành công');
               } catch (err) {
-                alert("Cập nhật thất bại!");
+                showAlert('Cập nhật sản phẩm thất bại', 'error');
               }
             }}
           />
