@@ -1,59 +1,39 @@
-import { CirclePlus, Edit, Eye, Trash2, X } from "lucide-react";
+import {
+  CirclePlus,
+  Edit,
+  Eye,
+  Trash2,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./ProductList.css"; // Import CSS
+import "./ProductList.css";
 import ProductForm from "./ProductForm";
 import ProductDetail from "./ProductDetail";
 import * as productService from "../../services/productService";
+
 export default function ProductList() {
-  const [successMessage, setSuccessMessage] = useState(''); // Thông báo thành công
-  const navigate = useNavigate(); // Dùng để chuyển hướng trang (hook)
-  const [products, setProducts] = useState([]); // Danh sách sản phẩm
-  const [filteredProducts, setFilteredProducts] = useState([]); // Danh sách sản phẩm sau lọc (tạm để trống vì chưa có tìm kiếm)
-  const [showCreateModal, setShowCreateModal] = useState(false); // Trạng thái tạo sản phẩm
-  const [showEditModal, setShowEditModal] = useState(false); // Trạng thái sửa
-  const [showDetailModal, setShowDetailModal] = useState(false); // Trạng thái xem chi tiết
-  const [editingProduct, setEditingProduct] = useState(null); // Đối tượng sản phẩm đang sửa
-  const [detailProduct, setDetailProduct] = useState(null); // Đối tượng sản phẩm đang xem chi tiết
-  const [newProduct, setNewProduct] = useState({
-    // Dữ liệu form tạo sản phẩm
-    name: "",
-    price: "",
-    quantity: "",
-    category: "model",
-  });
-  // Demo data, khi test cho nhung cai khong lien quan toi api
-  const demoProducts = [
-    {
-      id: 1,
-      name: "Tai nghe BluH-CH520",
-      price: 1290000,
-      quantity: 10,
-      category: "electronics",
-    },
-    {
-      id: 2,
-      name: "Snack ",
-      price: 18000,
-      quantity: 120,
-      category: "food",
-    },
-    {
-      id: 3,
-      name: "Mô hình Gu-2 HG 1/144",
-      price: 499000,
-      quantity: 15,
-      category: "model",
-    },
-    {
-      id: 4,
-      name: "Chuột Logitech Ment Plus",
-      price: 390000,
-      quantity: 40,
-      category: "electronics",
-    },
-  ];
-  //khi test cho api
+  const [successMessage, setSuccessMessage] = useState("");
+  const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [detailProduct, setDetailProduct] = useState(null);
+
+  // Tìm kiếm & lọc
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  // Phân trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Lấy dữ liệu
   useEffect(() => {
     async function fetchData() {
       try {
@@ -67,43 +47,44 @@ export default function ProductList() {
     fetchData();
   }, []);
 
-  const handleCreateProduct = async () => {
-    const product = {
-      id: products.length + 1,
-      ...newProduct,
-      price: Number(newProduct.price),
-      quantity: Number(newProduct.quantity),
-    };
-    setProducts([...products, product]); // Thêm vào danh sách hiện ngay dưới bảng
-    setShowCreateModal(false);
-    setNewProduct({ name: "", price: "", quantity: "", category: "model" }); // Reset form
+  // Lọc dữ liệu khi search hoặc chọn danh mục
+  useEffect(() => {
+    let result = products;
+
+    if (searchTerm.trim()) {
+      result = result.filter((p) =>
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (selectedCategory !== "all") {
+      result = result.filter((p) => p.category === selectedCategory);
+    }
+
+    setFilteredProducts(result);
+    setCurrentPage(1); // Reset trang khi lọc
+  }, [searchTerm, selectedCategory, products]);
+
+  // Phân trang
+  const totalItems = filteredProducts.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentItems = filteredProducts.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  const showAlert = (message, type = 'success') => {
-    if (type === 'success') {
+  const showAlert = (message, type = "success") => {
+    if (type === "success") {
       setSuccessMessage(message);
-      setTimeout(() => setSuccessMessage(''), 3000);
+      setTimeout(() => setSuccessMessage(""), 3000);
     } else {
-      // Xử lý cho trường hợp error
       alert(message);
     }
-  };
-
-  const handleEditProduct = () => {
-    // Hàm handle khi sửa sản phẩm
-    setProducts(
-      products.map((p) =>
-        p.id === editingProduct.id
-          ? {
-            ...editingProduct,
-            price: Number(editingProduct.price),
-            quantity: Number(editingProduct.quantity),
-          }
-          : p
-      )
-    );
-    setShowEditModal(false);
-    setEditingProduct(null);
   };
 
   const handleDeleteProduct = async (id) => {
@@ -111,10 +92,10 @@ export default function ProductList() {
       try {
         await productService.deleteProduct(id);
         setProducts(products.filter((p) => p.id !== id));
-        showAlert('Xóa sản phẩm thành công!');
+        showAlert("Xóa sản phẩm thành công!");
       } catch (error) {
         console.error("Xóa sản phẩm thất bại:", error);
-        showAlert('Xóa sản phẩm thất bại!', 'error');
+        showAlert("Xóa sản phẩm thất bại!", "error");
       }
     }
   };
@@ -132,11 +113,7 @@ export default function ProductList() {
   };
 
   const getCategoryName = (category) => {
-    const map = {
-      electronics: "Điện tử",
-      food: "Thức ăn",
-      model: "Mô hình",
-    };
+    const map = { electronics: "Điện tử", food: "Thức ăn", model: "Mô hình" };
     return map[category] || category;
   };
 
@@ -145,6 +122,7 @@ export default function ProductList() {
     localStorage.removeItem("isLoggedIn");
     navigate("/login");
   };
+
   return (
     <>
       <div className="container">
@@ -153,22 +131,21 @@ export default function ProductList() {
             className="success-message"
             data-testid="success-message"
             style={{
-              background: '#d4edda',
-              color: '#155724',
-              padding: '10px',
-              borderRadius: '4px',
-              marginBottom: '15px',
-              border: '1px solid #c3e6cb'
+              background: "#d4edda",
+              color: "#155724",
+              padding: "10px",
+              borderRadius: "4px",
+              marginBottom: "15px",
+              border: "1px solid #c3e6cb",
             }}
           >
             {successMessage}
           </div>
         )}
 
-        {/* Header */}
         <h1 className="title">Quản lý sản phẩm</h1>
+
         <div className="header">
-          {/* Nút Thêm sản phẩm - bên trái */}
           <button
             onClick={() => setShowCreateModal(true)}
             className="btn-primary"
@@ -177,8 +154,6 @@ export default function ProductList() {
             <CirclePlus className="icon-small" />
             <span>Thêm sản phẩm</span>
           </button>
-
-          {/* Nút Đăng xuất - bên phải */}
           <button
             onClick={handleLogout}
             className="btn-logout"
@@ -188,11 +163,97 @@ export default function ProductList() {
           </button>
         </div>
 
+        {/* THANH TÌM KIẾM + LỌC - ĐÃ SỬA ĐẸP, KHÔNG DÍNH NHAU */}
+        <div
+          style={{
+            margin: "20px 0",
+            padding: "16px",
+            background: "#f8f9fa",
+            borderRadius: "8px",
+            border: "1px solid #e9ecef",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "16px",
+            alignItems: "center",
+          }}
+        >
+          {/* Ô tìm kiếm */}
+          <div
+            style={{
+              position: "relative",
+              flex: "1 1 320px",
+              maxWidth: "500px",
+            }}
+          >
+            <Search
+              style={{
+                position: "absolute",
+                left: "14px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#6c757d",
+                width: "20px",
+                height: "20px",
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Tìm kiếm tên sản phẩm..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: "450px",
+                padding: "12px 16px 12px 44px",
+                borderRadius: "8px",
+                border: "1px solid #ced4da",
+                fontSize: "15px",
+                outline: "none",
+                transition: "border 0.2s",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#4dabf7")}
+              onBlur={(e) => (e.target.style.borderColor = "#ced4da")}
+            />
+          </div>
+
+          {/* Bộ lọc danh mục */}
+          <div style={{ flex: "0 1 200px" }}>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: "8px",
+                border: "1px solid #ced4da",
+                fontSize: "15px",
+                backgroundColor: "white",
+                cursor: "pointer",
+              }}
+            >
+              <option value="all">Tất cả danh mục</option>
+              <option value="electronics">Điện tử</option>
+              <option value="food">Thức ăn</option>
+              <option value="model">Mô hình</option>
+            </select>
+          </div>
+
+          {/* Thông tin kết quả */}
+          <div
+            style={{
+              color: "#495057",
+              fontSize: "14px",
+              whiteSpace: "nowrap",
+              marginLeft: "auto",
+            }}
+          >
+            Tìm thấy <strong>{totalItems}</strong> sản phẩm
+          </div>
+        </div>
+
         {/* Bảng sản phẩm */}
         <div className="table-card">
           <div className="table-wrapper">
             <table className="table">
-              {/* Header bảng */}
               <thead>
                 <tr>
                   <th>Mã sản phẩm</th>
@@ -203,44 +264,35 @@ export default function ProductList() {
                   <th className="text-right">Thao tác</th>
                 </tr>
               </thead>
-
-              {/* Body bảng */}
               <tbody>
-                {products && products.length > 0 ? (
-                  products.map((product) => (
-                    <tr key={product.id} className="table-row-hover" data-testid="product-item">
-                      {/* Mã sản phẩm */}
+                {currentItems.length > 0 ? (
+                  currentItems.map((product) => (
+                    <tr
+                      key={product.id}
+                      className="table-row-hover"
+                      data-testid="product-item"
+                    >
                       <td>
                         <div className="user-name">
                           SP-{product.id.toString().padStart(3, "0")}
                         </div>
                       </td>
-
-                      {/* Tên sản phẩm */}
                       <td>
                         <div className="user-name">{product.name}</div>
                       </td>
-
-                      {/* Giá */}
                       <td>
                         <div className="user-name">
                           {formatPrice(product.price)}
                         </div>
                       </td>
-
-                      {/* Số lượng */}
                       <td>
                         <div className="user-name">{product.quantity}</div>
                       </td>
-
-                      {/* Loại */}
                       <td>
                         <span className={`badge role-${product.category}`}>
                           {getCategoryName(product.category)}
                         </span>
                       </td>
-
-                      {/* Thao tác */}
                       <td className="action-cell">
                         <div className="action-buttons">
                           <button
@@ -250,7 +302,6 @@ export default function ProductList() {
                           >
                             <Eye className="icon-small" />
                           </button>
-
                           <button
                             onClick={() => {
                               setEditingProduct(product);
@@ -261,7 +312,6 @@ export default function ProductList() {
                           >
                             <Edit className="icon-small" />
                           </button>
-
                           <button
                             onClick={() => handleDeleteProduct(product.id)}
                             className="btn-icon text-red"
@@ -275,8 +325,14 @@ export default function ProductList() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center py-3">
-                      Không có sản phẩm nào
+                    <td
+                      colSpan="6"
+                      className="text-center py-4"
+                      style={{ color: "#6c757d" }}
+                    >
+                      {searchTerm || selectedCategory !== "all"
+                        ? "Không tìm thấy sản phẩm nào phù hợp"
+                        : "Không có sản phẩm nào"}
                     </td>
                   </tr>
                 )}
@@ -285,6 +341,67 @@ export default function ProductList() {
           </div>
         </div>
 
+        {/* Phân trang */}
+        {totalPages > 1 && (
+          <div
+            style={{
+              marginTop: "24px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              style={{
+                padding: "10px 14px",
+                borderRadius: "8px",
+                border: "1px solid #dee2e6",
+                background: currentPage === 1 ? "#f8f9fa" : "white",
+                cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+              }}
+            >
+              <ChevronLeft size={18} /> Trước
+            </button>
+
+            <span style={{ fontSize: "15px", color: "#495057" }}>
+              Trang <strong>{currentPage}</strong> / {totalPages}
+            </span>
+
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              style={{
+                padding: "10px 14px",
+                borderRadius: "8px",
+                border: "1px solid #dee2e6",
+                background: currentPage === totalPages ? "#f8f9fa" : "white",
+                cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+              }}
+            >
+              Sau <ChevronRight size={18} />
+            </button>
+
+            <span
+              style={{ marginLeft: "20px", color: "#6c757d", fontSize: "14px" }}
+            >
+              Hiển thị {(currentPage - 1) * itemsPerPage + 1}–
+              {Math.min(currentPage * itemsPerPage, totalItems)} trong{" "}
+              {totalItems}
+            </span>
+          </div>
+        )}
+
+        {/* Các Modal giữ nguyên */}
         {showCreateModal && (
           <ProductForm
             mode="create"
@@ -293,13 +410,14 @@ export default function ProductList() {
             onCancel={() => setShowCreateModal(false)}
             onSubmit={async (product) => {
               try {
-                console.log(product);
-                const newProductFromApi = await productService.createProduct(product);
+                const newProductFromApi = await productService.createProduct(
+                  product
+                );
                 setProducts([...products, newProductFromApi]);
                 setShowCreateModal(false);
-                showAlert('Thêm sản phẩm thành công');
+                showAlert("Thêm sản phẩm thành công");
               } catch (err) {
-                showAlert('Thêm sản phẩm thất bại', 'error');
+                showAlert("Thêm sản phẩm thất bại", "error");
               }
             }}
           />
@@ -312,13 +430,17 @@ export default function ProductList() {
             onCancel={() => setShowEditModal(false)}
             onSubmit={async (updatedProduct) => {
               try {
-                const saved = await productService.updateProduct(updatedProduct.id, updatedProduct);
-                setProducts(products.map(p => p.id === saved.id ? saved : p));
-                console.log(updatedProduct);
+                const saved = await productService.updateProduct(
+                  updatedProduct.id,
+                  updatedProduct
+                );
+                setProducts(
+                  products.map((p) => (p.id === saved.id ? saved : p))
+                );
                 setShowEditModal(false);
-                showAlert('Cập nhật sản phẩm thành công');
+                showAlert("Cập nhật sản phẩm thành công");
               } catch (err) {
-                showAlert('Cập nhật sản phẩm thất bại', 'error');
+                showAlert("Cập nhật sản phẩm thất bại", "error");
               }
             }}
           />
