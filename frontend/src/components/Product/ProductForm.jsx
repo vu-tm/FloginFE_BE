@@ -3,11 +3,11 @@ import { useState } from "react";
 import "./ProductList.css";
 
 export default function ProductForm({
-  mode,           // 'create' | 'edit'
+  mode, // 'create' | 'edit'
   initialProduct, // dữ liệu ban đầu (khi edit) hoặc {} khi create
   onCancel,
-  onSubmit,       // nhận vào object product đã đúng định dạng
-  nextId,         // chỉ dùng khi create để hiển thị mã SP-xxx
+  onSubmit, // nhận vào object product đã đúng định dạng
+  nextId, // chỉ dùng khi create để hiển thị mã SP-xxx
 }) {
   const isCreate = mode === "create";
 
@@ -25,10 +25,41 @@ export default function ProductForm({
     }));
   };
 
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   const submittedProduct = {
+  //     // id sẽ do backend sinh hoặc bạn truyền nextId khi create (nếu cần hiển thị tạm)
+  //     ...(isCreate ? {} : { id: initialProduct.id }),
+  //     name: formData.name.trim(),
+  //     price: Number(formData.price) || 0,
+  //     quantity: Number(formData.quantity) || 0,
+  //     category: formData.category,
+  //   };
+
+  //   // Gọi callback từ cha (ProductList) để xử lý tiếp (gọi API hoặc cập nhật state)
+  //   onSubmit(submittedProduct);
+
+  //   // Nếu là create → reset form
+  //   if (isCreate) {
+  //     setFormData({
+  //       name: "",
+  //       price: "",
+  //       quantity: "",
+  //       category: "model",
+  //     });
+  //   }
+  // };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // KIỂM TRA FORM HỢP LỆ TRƯỚC KHI GỌI onSubmit
+    if (!e.target.checkValidity()) {
+      e.target.reportValidity(); // hiện thông báo lỗi của browser (tốt cho UX)
+      return; // DỪNG LẠI, KHÔNG gọi onSubmit
+    }
+
     const submittedProduct = {
-      // id sẽ do backend sinh hoặc bạn truyền nextId khi create (nếu cần hiển thị tạm)
       ...(isCreate ? {} : { id: initialProduct.id }),
       name: formData.name.trim(),
       price: Number(formData.price) || 0,
@@ -36,10 +67,8 @@ export default function ProductForm({
       category: formData.category,
     };
 
-    // Gọi callback từ cha (ProductList) để xử lý tiếp (gọi API hoặc cập nhật state)
     onSubmit(submittedProduct);
 
-    // Nếu là create → reset form
     if (isCreate) {
       setFormData({
         name: "",
@@ -141,7 +170,11 @@ export default function ProductForm({
             <button type="button" onClick={onCancel} className="btn-secondary">
               Hủy
             </button>
-            <button type="submit" className="btn-primary" data-testid="submit-btn">
+            <button
+              type="submit"
+              className="btn-primary"
+              data-testid="submit-btn"
+            >
               {submitLabel}
             </button>
           </div>

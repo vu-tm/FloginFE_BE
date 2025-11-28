@@ -1,5 +1,5 @@
 // src/tests/ProductForm.test.js
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ProductForm from "../components/Product/ProductForm";
 
@@ -136,7 +136,10 @@ describe("ProductForm Component", () => {
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 
-  test("reset form sau khi thêm sản phẩm thành công (create)", () => {
+  test("reset form sau khi thêm sản phẩm thành công (create)", async () => {
+    const mockOnSubmit = jest.fn();
+    const mockOnCancel = jest.fn();
+
     render(
       <ProductForm
         mode="create"
@@ -147,14 +150,36 @@ describe("ProductForm Component", () => {
       />
     );
 
+    // Nhập dữ liệu
     fireEvent.change(screen.getByPlaceholderText("Nhập tên sản phẩm"), {
       target: { value: "Test product" },
     });
+    fireEvent.change(screen.getByPlaceholderText("Nhập giá"), {
+      target: { value: "999999" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Nhập số lượng"), {
+      target: { value: "99" },
+    });
+
+    // Click Thêm → onSubmit được gọi và form reset
     fireEvent.click(screen.getByText("Thêm"));
 
-    // Sau khi submit → form bị reset
-    expect(screen.getByPlaceholderText("Nhập tên sản phẩm").value).toBe("");
-    expect(screen.getByPlaceholderText("Nhập giá").value).toBe("");
-    expect(screen.getByPlaceholderText("Nhập số lượng").value).toBe("");
+    // Đợi React re-render với form đã reset
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    // Bây giờ mới kiểm tra giá trị đã reset về rỗng
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("Nhập tên sản phẩm").value).toBe("");
+    });
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("Nhập giá").value).toBe("");
+    });
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("Nhập số lượng").value).toBe("");
+    });
   });
 });
