@@ -12,7 +12,6 @@ export async function loginUser(username, password) {
     {
     const response = await api.post('/login', { username, password });
 
-    const token = response.data.token;
     return response.data;
     }
     catch (error)
