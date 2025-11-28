@@ -16,7 +16,7 @@ describe("ProductForm Component", () => {
     render(
       <ProductForm
         mode="create"
-        product={mockProduct}
+        initialProduct={mockProduct}
         onChange={() => {}}
         onCancel={() => {}}
         onSubmit={() => {}}
@@ -31,7 +31,7 @@ describe("ProductForm Component", () => {
     render(
       <ProductForm
         mode="create"
-        product={mockProduct}
+        initialProduct={mockProduct}
         onChange={handleChange}
         onCancel={() => {}}
         onSubmit={() => {}}
@@ -53,7 +53,7 @@ describe("ProductForm Component", () => {
     render(
       <ProductForm
         mode="create"
-        product={mockProduct}
+        initialProduct={mockProduct}
         onChange={handleChange}
         onCancel={() => {}}
         onSubmit={() => {}}
@@ -73,7 +73,7 @@ describe("ProductForm Component", () => {
     render(
       <ProductForm
         mode="create"
-        product={mockProduct}
+        initialProduct={mockProduct}
         onChange={handleChange}
         onCancel={() => {}}
         onSubmit={() => {}}
@@ -93,7 +93,7 @@ describe("ProductForm Component", () => {
     render(
       <ProductForm
         mode="create"
-        product={mockProduct}
+        initialProduct={mockProduct}
         onChange={handleChange}
         onCancel={() => {}}
         onSubmit={() => {}}
@@ -113,7 +113,7 @@ describe("ProductForm Component", () => {
     render(
       <ProductForm
         mode="create"
-        product={mockProduct}
+        initialProduct={mockProduct}
         onChange={() => {}}
         onCancel={() => {}}
         onSubmit={handleSubmit}
@@ -129,7 +129,7 @@ describe("ProductForm Component", () => {
     render(
       <ProductForm
         mode="create"
-        product={mockProduct}
+        initialProduct={mockProduct}
         onChange={() => {}}
         onCancel={handleCancel}
         onSubmit={() => {}}

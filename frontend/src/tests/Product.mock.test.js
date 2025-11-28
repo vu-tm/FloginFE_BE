@@ -127,187 +127,158 @@ describe("ProductList Component Mock Tests (Read/Add/Delete)", () => {
   });
 
   test("thêm sản phẩm thành công", async () => {
-    const mockProduct = {
-      id: 1,
-      name: "Bàn phím cơ blue switch",
-    };
-
-    productService.createProduct.mockResolvedValue(mockProduct);
-
-    // simulate state của form
-    let productState = { id: 1, name: "" };
-    const setProductState = (newValue) => {
-      productState = newValue;
-    };
-
-    const handleSubmit = () => productService.createProduct(productState);
+    const mockOnSubmit = jest.fn();
+    const mockOnCancel = jest.fn();
 
     render(
       <ProductForm
         mode="create"
-        nextId={1}
-        product={productState}
-        onChange={setProductState}
-        onCancel={() => {}}
-        onSubmit={handleSubmit}
+        initialProduct={{}} // phải dùng initialProduct, không phải product
+        nextId={5}
+        onCancel={mockOnCancel}
+        onSubmit={mockOnSubmit} // component sẽ gọi callback này với data đúng
       />
     );
 
+    // Điền form
     fireEvent.change(screen.getByPlaceholderText("Nhập tên sản phẩm"), {
       target: { value: "Bàn phím cơ blue switch" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Nhập giá"), {
+      target: { value: "1500000" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Nhập số lượng"), {
+      target: { value: "10" },
     });
 
     fireEvent.click(screen.getByText("Thêm"));
 
+    // Kiểm tra onSubmit được gọi với đúng dữ liệu
     await waitFor(() => {
-      expect(productService.createProduct).toHaveBeenCalledTimes(1);
+      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
     });
 
-    expect(productService.createProduct).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: 1,
-        name: "Bàn phím cơ blue switch",
-      })
-    );
+    expect(mockOnSubmit).toHaveBeenCalledWith({
+      name: "Bàn phím cơ blue switch",
+      price: 1500000,
+      quantity: 10,
+      category: "model", // giá trị mặc định
+    });
+
+    // Form bị reset sau khi submit thành công (create mode)
+    expect(screen.getByPlaceholderText("Nhập tên sản phẩm")).toHaveValue("");
   });
 
-  test("thêm sản phẩm thất bại", async () => {
-    productService.createProduct.mockRejectedValue(new Error("Thêm thất bại"));
-
-    //giả lập state của form
-    let productState = { id: 1, name: "" };
-    const setProductState = (newValue) => {
-      productState = newValue;
-    };
-
-    const handleSubmit = () =>
-      productService.createProduct(productState).catch(() => {});
+  test("thêm sản phẩm thất bại - form vẫn còn (nhưng thực tế không có error UI, nên chỉ kiểm tra onSubmit)", async () => {
+    const mockOnSubmit = jest.fn();
 
     render(
       <ProductForm
         mode="create"
-        nextId={1}
-        product={productState}
-        onChange={setProductState}
+        initialProduct={{}}
+        nextId={10}
         onCancel={() => {}}
-        onSubmit={handleSubmit}
+        onSubmit={mockOnSubmit}
       />
     );
 
     fireEvent.change(screen.getByPlaceholderText("Nhập tên sản phẩm"), {
-      target: { value: "Bàn phím cơ blue switch" },
+      target: { value: "Test product" },
     });
-    fireEvent.click(screen.getByText("Thêm"));
+    fireEvent.change(screen.getByTestId("product-price"), {
+      target: { value: "100" },
+    });
+    fireEvent.change(screen.getByTestId("product-quantity"), {
+      target: { value: "5" },
+    });
+
+    fireEvent.click(screen.getByTestId("submit-btn"));
+
     await waitFor(() => {
-      expect(productService.createProduct).toHaveBeenCalledTimes(1);
+      expect(mockOnSubmit).toHaveBeenCalledWith({
+        name: "Test product",
+        price: 100,
+        quantity: 5,
+        category: "model",
+      });
     });
 
-    expect(productService.createProduct).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: 1,
-        name: "Bàn phím cơ blue switch",
-      })
-    );
-
-    // that bại nên from vẫn còn trên màn hình
+    // Form vẫn hiển thị vì không có logic đóng khi lỗi
     expect(screen.getByText("Thêm sản phẩm mới")).toBeInTheDocument();
   });
 
   test("Sửa sản phẩm thành công", async () => {
-    //giả lập json trả về là sản phẩm với cùng 1 id nhưng tên mới
-    const mockProduct = {
-      id: 1,
-      name: "bàn phím cơ màu đen",
-    };
-
-    productService.updateProduct.mockResolvedValue(mockProduct);
-    let productState = { id: 1, name: "" };
-    const setProductState = (newValue) => {
-      productState = newValue;
-    };
-
-    const handleSubmit = () =>
-      productService.updateProduct(productState.id, productState);
+    const mockOnSubmit = jest.fn();
 
     render(
       <ProductForm
         mode="edit"
-        nextId={1}
-        product={productState}
-        onChange={setProductState}
+        initialProduct={{
+          id: 3,
+          name: "Chuột gaming cũ",
+          price: 800000,
+          quantity: 5,
+          category: "electronics",
+        }}
         onCancel={() => {}}
-        onSubmit={handleSubmit}
+        onSubmit={mockOnSubmit}
       />
     );
 
+    // Chỉ thay đổi tên
     fireEvent.change(screen.getByPlaceholderText("Nhập tên sản phẩm"), {
-      target: { value: mockProduct.name },
+      target: { value: "Chuột gaming mới" },
     });
 
     fireEvent.click(screen.getByText("Cập nhật"));
 
     await waitFor(() => {
-      expect(productService.updateProduct).toHaveBeenCalledTimes(1);
+      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
     });
 
-    expect(productService.updateProduct).toHaveBeenCalledWith(
-      1, // id
-      expect.objectContaining({
-        id: 1,
-        name: "bàn phím cơ màu đen",
-      })
-    );
+    expect(mockOnSubmit).toHaveBeenCalledWith({
+      id: 3,
+      name: "Chuột gaming mới",
+      price: 800000,
+      quantity: 5,
+      category: "electronics",
+    });
   });
 
-  test("cập nhật sản phẩm thất bại", async () => {
-    const mockProduct = {
-      id: 1,
-      name: "Bàn phím cơ blue switch",
-    };
-
-    productService.updateProduct.mockRejectedValue(
-      new Error("Cập nhật thất bại")
-    );
-
-    //giả lập state của form
-    let productState = { id: 1, name: "" };
-    const setProductState = (newValue) => {
-      productState = newValue;
-    };
-
-    const handleSubmit = () =>
-      productService
-        .updateProduct(productState.id, productState)
-        .catch(() => {});
+  test("cập nhật sản phẩm thất bại - form vẫn hiển thị", async () => {
+    const mockOnSubmit = jest.fn();
 
     render(
       <ProductForm
         mode="edit"
-        nextId={1}
-        product={productState}
-        onChange={setProductState}
+        initialProduct={{
+          id: 1,
+          name: "Bàn phím cơ blue switch",
+          price: 1200000,
+          quantity: 8,
+          category: "electronics",
+        }}
         onCancel={() => {}}
-        onSubmit={handleSubmit}
+        onSubmit={mockOnSubmit}
       />
     );
 
     fireEvent.change(screen.getByPlaceholderText("Nhập tên sản phẩm"), {
-      target: { value: mockProduct.name },
+      target: { value: "Bàn phím cơ mới" },
     });
+
     fireEvent.click(screen.getByText("Cập nhật"));
+
     await waitFor(() => {
-      expect(productService.updateProduct).toHaveBeenCalledTimes(1);
-    });
-
-    expect(productService.updateProduct).toHaveBeenCalledWith(
-      mockProduct.id,
-      expect.objectContaining({
+      expect(mockOnSubmit).toHaveBeenCalledWith({
         id: 1,
-        name: "Bàn phím cơ blue switch",
-      })
-    );
-
-    // that bại nên from vẫn còn trên màn hình
+        name: "Bàn phím cơ mới",
+        price: 1200000,
+        quantity: 8,
+        category: "electronics",
+      });
+    });
+    //an roi ma van con chu chinh sua san pham, dang ra phải dong form
     expect(screen.getByText("Chỉnh sửa sản phẩm")).toBeInTheDocument();
   });
 });

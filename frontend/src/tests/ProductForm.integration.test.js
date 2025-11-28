@@ -15,7 +15,7 @@ describe("product integration test", () => {
     render(
       <ProductForm
         mode="create"
-        product={product}
+        initialProduct={product}
         onChange={mockOnChange}
         onCancel={mockOnCancel}
         onSubmit={mockOnSubmit}
@@ -43,8 +43,7 @@ describe("product integration test", () => {
   });
 
   //test voi sua san pham
-  test("cap nhan san pham thanh cong", async () => {
-    const mockOnChange = jest.fn();
+  test("cap nhat san pham thanh cong", async () => {
     const mockOnSubmit = jest.fn();
     const mockOnCancel = jest.fn();
 
@@ -55,29 +54,30 @@ describe("product integration test", () => {
       quantity: "10",
       category: "model",
     };
+
     render(
       <ProductForm
         mode="edit"
-        product={product}
-        onChange={mockOnChange}
+        initialProduct={product}
         onCancel={mockOnCancel}
         onSubmit={mockOnSubmit}
         nextId={4}
       />
     );
 
-    // sua ten san pham
     fireEvent.change(screen.getByPlaceholderText("Nhập tên sản phẩm"), {
       target: { value: "Robo Trái cây đỏ" },
     });
 
     fireEvent.click(screen.getByText("Cập nhật"));
+
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalled();
     });
-    //kiemerm tra xem tên mới được truyền vào
-    const updateProduct = mockOnChange.mock.calls[0]?.[0]; // lay doi tuong san pham mới nhat mà nguoi dung vua sua
-    expect(updateProduct?.name).toBe("Robo Trái cây đỏ");
+
+    const updatedProduct = mockOnSubmit.mock.calls[0][0];
+
+    expect(updatedProduct.name).toBe("Robo Trái cây đỏ");
   });
 
   test("thao tac huy", async () => {
@@ -86,7 +86,7 @@ describe("product integration test", () => {
     render(
       <ProductForm
         mode="create"
-        product={product}
+        initialProduct={product}
         onChange={() => {}}
         onCancel={mockOnCancel}
         onSubmit={() => {}}

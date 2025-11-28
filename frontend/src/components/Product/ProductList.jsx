@@ -16,7 +16,7 @@ import * as productService from "../../services/productService";
 
 export default function ProductList() {
   const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -42,6 +42,7 @@ export default function ProductList() {
         setProducts(data);
         setFilteredProducts(data);
       } catch (error) {
+        alert("Lỗi khi tải sản phẩm");
         console.error("Lỗi khi tải sản phẩm:", error);
       }
     }
@@ -79,16 +80,16 @@ export default function ProductList() {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  const showAlert = (message, type = 'success') => {
-    if (type === 'success') {
+  const showAlert = (message, type = "success") => {
+    if (type === "success") {
       setSuccessMessage(message);
-      setErrorMessage(''); // Clear error message khi có success
-      setTimeout(() => setSuccessMessage(''), 3000);
+      setErrorMessage(""); // Clear error message khi có success
+      setTimeout(() => setSuccessMessage(""), 3000);
     } else {
       // Xử lý cho trường hợp error
       setErrorMessage(message);
-      setSuccessMessage(''); // Clear success message khi có error
-      setTimeout(() => setErrorMessage(''), 3000);
+      setSuccessMessage(""); // Clear success message khi có error
+      setTimeout(() => setErrorMessage(""), 3000);
     }
   };
 
@@ -131,7 +132,6 @@ export default function ProductList() {
   return (
     <>
       <div className="container">
-
         <h1 className="title">Quản lý sản phẩm</h1>
 
         <div className="header">
@@ -239,18 +239,17 @@ export default function ProductList() {
           </div>
         </div>
 
-
         {successMessage && (
           <div
             className="success-message"
             data-testid="success-message"
             style={{
-              background: '#d4edda',
-              color: '#155724',
-              padding: '10px',
-              borderRadius: '4px',
-              marginBottom: '15px',
-              border: '1px solid #c3e6cb'
+              background: "#d4edda",
+              color: "#155724",
+              padding: "10px",
+              borderRadius: "4px",
+              marginBottom: "15px",
+              border: "1px solid #c3e6cb",
             }}
           >
             {successMessage}
@@ -262,12 +261,12 @@ export default function ProductList() {
             className="error-message"
             data-testid="error-message"
             style={{
-              background: '#f8d7da',
-              color: '#721c24',
-              padding: '10px',
-              borderRadius: '4px',
-              marginBottom: '15px',
-              border: '1px solid #f5c6cb'
+              background: "#f8d7da",
+              color: "#721c24",
+              padding: "10px",
+              borderRadius: "4px",
+              marginBottom: "15px",
+              border: "1px solid #f5c6cb",
             }}
           >
             {errorMessage}
@@ -302,7 +301,9 @@ export default function ProductList() {
                         </div>
                       </td>
                       <td>
-                        <div className="user-name" data-testid="product-name">{product.name}</div>
+                        <div className="user-name" data-testid="product-name">
+                          {product.name}
+                        </div>
                       </td>
                       <td>
                         <div className="user-name" data-testid="product-price">
@@ -310,7 +311,12 @@ export default function ProductList() {
                         </div>
                       </td>
                       <td>
-                        <div className="user-name" data-testid="product-quantity">{product.quantity}</div>
+                        <div
+                          className="user-name"
+                          data-testid="product-quantity"
+                        >
+                          {product.quantity}
+                        </div>
                       </td>
                       <td>
                         <span className={`badge role-${product.category}`}>
