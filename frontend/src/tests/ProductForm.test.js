@@ -1,142 +1,160 @@
+// src/tests/ProductForm.test.js
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ProductForm from "../components/Product/ProductForm";
 
-// tao san pham mac dinh de test
 describe("ProductForm Component", () => {
-  const mockProduct = {
-    id: 1,
-    name: "",
-    price: "",
-    quantity: "",
-    category: "",
-  };
+  const mockOnSubmit = jest.fn();
+  const mockOnCancel = jest.fn();
 
-  test("hien thi tieu de khi an them san pham", () => {
+  // Reset mock trước mỗi test
+  beforeEach(() => {
+    mockOnSubmit.mockClear();
+    mockOnCancel.mockClear();
+  });
+
+  test("hiển thị tiêu đề 'Thêm sản phẩm mới' khi mode=create", () => {
     render(
       <ProductForm
         mode="create"
-        initialProduct={mockProduct}
-        onChange={() => {}}
-        onCancel={() => {}}
-        onSubmit={() => {}}
-        nextId={2}
+        initialProduct={{}}
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+        nextId={5}
       />
     );
     expect(screen.getByText("Thêm sản phẩm mới")).toBeInTheDocument();
   });
 
-  test("tét cho nhập tên sản phẩm và gọi onChange", () => {
-    const handleChange = jest.fn();
+  test("hiển thị tiêu đề 'Chỉnh sửa sản phẩm' khi mode=edit", () => {
+    render(
+      <ProductForm
+        mode="edit"
+        initialProduct={{ id: 1, name: "iPhone", price: 30000000 }}
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+      />
+    );
+    expect(screen.getByText("Chỉnh sửa sản phẩm")).toBeInTheDocument();
+  });
+
+  test("hiển thị mã sản phẩm đúng định dạng SP-005 khi create", () => {
     render(
       <ProductForm
         mode="create"
-        initialProduct={mockProduct}
-        onChange={handleChange}
-        onCancel={() => {}}
+        initialProduct={{}}
         onSubmit={() => {}}
-        nextId={2}
+        onCancel={() => {}}
+        nextId={5}
       />
     );
-    const nameInput = screen.getByPlaceholderText("Nhập tên sản phẩm");
-    fireEvent.change(nameInput, {
-      target: { value: "Điện thoại Iphone 17 Promax" },
+    expect(screen.getByDisplayValue("SP-005")).toBeInTheDocument();
+  });
+
+  test("gọi onSubmit với dữ liệu đúng khi nhấn nút Thêm", () => {
+    render(
+      <ProductForm
+        mode="create"
+        initialProduct={{}}
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+        nextId={10}
+      />
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("Nhập tên sản phẩm"), {
+      target: { value: "Tai nghe Sony" },
     });
-    expect(handleChange).toHaveBeenCalledWith({
-      ...mockProduct,
-      name: "Điện thoại Iphone 17 Promax",
+    fireEvent.change(screen.getByPlaceholderText("Nhập giá"), {
+      target: { value: "1290000" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Nhập số lượng"), {
+      target: { value: "50" },
+    });
+
+    fireEvent.click(screen.getByTestId("submit-btn")); // dùng data-testid là chắc nhất
+
+    expect(mockOnSubmit).toHaveBeenCalledWith({
+      name: "Tai nghe Sony",
+      price: 1290000,
+      quantity: 50,
+      category: "model", // giá trị mặc định
     });
   });
 
-  test("test nhập giá sản phẩm", () => {
-    const handleChange = jest.fn();
+  test("gọi onSubmit với dữ liệu đã sửa khi edit", () => {
     render(
       <ProductForm
-        mode="create"
-        initialProduct={mockProduct}
-        onChange={handleChange}
-        onCancel={() => {}}
-        onSubmit={() => {}}
-        nextId={2}
+        mode="edit"
+        initialProduct={{
+          id: 3,
+          name: "Bánh Oreo",
+          price: 25000,
+          quantity: 100,
+          category: "food",
+        }}
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
       />
     );
-    const priceInput = screen.getByPlaceholderText("Nhập giá");
-    fireEvent.change(priceInput, { target: { value: 36000000 } });
-    expect(handleChange).toHaveBeenCalledWith({
-      ...mockProduct,
-      price: "36000000",
-    });
-  });
 
-  test("test nhập số lượng", () => {
-    const handleChange = jest.fn();
-    render(
-      <ProductForm
-        mode="create"
-        initialProduct={mockProduct}
-        onChange={handleChange}
-        onCancel={() => {}}
-        onSubmit={() => {}}
-        nextId={2}
-      />
-    );
-    const quantityInput = screen.getByPlaceholderText("Nhập số lượng");
-    fireEvent.change(quantityInput, { target: { value: 5 } });
-    expect(handleChange).toHaveBeenCalledWith({
-      ...mockProduct,
-      quantity: "5",
+    // Chỉ sửa tên
+    fireEvent.change(screen.getByDisplayValue("Bánh Oreo"), {
+      target: { value: "Bánh Oreo mới" },
     });
-  });
 
-  test("test chon the loai", () => {
-    const handleChange = jest.fn();
-    render(
-      <ProductForm
-        mode="create"
-        initialProduct={mockProduct}
-        onChange={handleChange}
-        onCancel={() => {}}
-        onSubmit={() => {}}
-        nextId={2}
-      />
-    );
-    const categorySelect = screen.getByRole("combobox"); // combobox = select
-    fireEvent.change(categorySelect, { target: { value: "food" } });
-    expect(handleChange).toHaveBeenCalledWith({
-      ...mockProduct,
+    fireEvent.click(screen.getByText("Cập nhật"));
+
+    expect(mockOnSubmit).toHaveBeenCalledWith({
+      id: 3,
+      name: "Bánh Oreo mới",
+      price: 25000,
+      quantity: 100,
       category: "food",
     });
   });
 
-  test("test goi onSubmit khi an nut them", () => {
-    const handleSubmit = jest.fn();
+  test("gọi onCancel khi nhấn nút Hủy hoặc click ngoài modal", () => {
     render(
       <ProductForm
         mode="create"
-        initialProduct={mockProduct}
-        onChange={() => {}}
-        onCancel={() => {}}
-        onSubmit={handleSubmit}
-        nextId={2}
+        initialProduct={{}}
+        onSubmit={() => {}}
+        onCancel={mockOnCancel}
+        nextId={1}
       />
     );
-    fireEvent.click(screen.getByText("Thêm"));
-    expect(handleSubmit).toHaveBeenCalled();
+
+    fireEvent.click(screen.getByText("Hủy"));
+    expect(mockOnCancel).toHaveBeenCalledTimes(1);
+
+    // Test click ngoài modal
+    mockOnCancel.mockClear();
+    fireEvent.click(
+      screen.getByText("Thêm sản phẩm mới").closest(".modal-overlay")
+    );
+    expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 
-  test("test goi onCancel khi an nut Huy", () => {
-    const handleCancel = jest.fn();
+  test("reset form sau khi thêm sản phẩm thành công (create)", () => {
     render(
       <ProductForm
         mode="create"
-        initialProduct={mockProduct}
-        onChange={() => {}}
-        onCancel={handleCancel}
-        onSubmit={() => {}}
-        nextId={2}
+        initialProduct={{}}
+        onSubmit={mockOnSubmit}
+        onCancel={mockOnCancel}
+        nextId={1}
       />
     );
-    fireEvent.click(screen.getByText("Hủy"));
-    expect(handleCancel).toHaveBeenCalled();
+
+    fireEvent.change(screen.getByPlaceholderText("Nhập tên sản phẩm"), {
+      target: { value: "Test product" },
+    });
+    fireEvent.click(screen.getByText("Thêm"));
+
+    // Sau khi submit → form bị reset
+    expect(screen.getByPlaceholderText("Nhập tên sản phẩm").value).toBe("");
+    expect(screen.getByPlaceholderText("Nhập giá").value).toBe("");
+    expect(screen.getByPlaceholderText("Nhập số lượng").value).toBe("");
   });
 });
