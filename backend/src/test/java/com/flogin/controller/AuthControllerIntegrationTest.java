@@ -66,14 +66,8 @@ public class AuthControllerIntegrationTest {
     @DisplayName("POST /api/auth/login - That bai do username khong ton tai")
     void testLoginFailure_usernameNotFound() throws Exception {
         LoginRequest request = new LoginRequest("testuser", "Test@123");
-        LoginResponse mockResponse = new LoginResponse(
-            false, 
-            "Khong tim thay username", 
-            null,
-            null
-        );
-
-        when(authService.authenticate(any(LoginRequest.class))).thenReturn(mockResponse);
+        
+        when(authService.authenticate(any(LoginRequest.class))).thenThrow(new RuntimeException("Khong tim thay username"));
 
         mockMvc.perform(post(LOGIN_API)
                     .contentType(MediaType.APPLICATION_JSON)

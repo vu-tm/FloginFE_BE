@@ -31,8 +31,6 @@ public class AuthService {
             return new LoginResponse(false, "Do dai username khong hop le", null, null);
         if (!request.getUsername().matches("^[a-zA-Z0-9\\-._]+$"))
             return new LoginResponse(false, "Username chua ki tu khong hop le", null, null);
-         if (request.getUsername().contains(" "))
-            return new LoginResponse(false, "Username chua khoang trang", null, null);
         
         //Validate password
         if (request.getPassword() == "")
@@ -47,14 +45,10 @@ public class AuthService {
         //Truy xuất database
         User user = userRepository.findById(request.getUsername())
             .orElseThrow(() -> new RuntimeException("Khong tim thay username"));
-        if (user != null)
-        {
-            if (passwordEncoder.matches(request.getPassword(), user.getPassword())) 
-                { 
-                    return new LoginResponse(true, "Dang nhap thanh cong", tokenService.generateToken(user), new UserDto(user.getUsername(), user.getEmail()));
-                }
-            return new LoginResponse(false, "Sai mat khau", null, null);           
+
+        if (passwordEncoder.matches(request.getPassword(), user.getPassword())) { 
+            return new LoginResponse(true, "Dang nhap thanh cong", tokenService.generateToken(user), new UserDto(user.getUsername(), user.getEmail()));
         }
-        return new LoginResponse(false, null, null, null);           
+        return new LoginResponse(false, "Sai mat khau", null, null);           
     }
 }
