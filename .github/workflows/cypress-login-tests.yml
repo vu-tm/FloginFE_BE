@@ -1,56 +1,38 @@
-name: Run Login Tests
+name: Frontend Login Tests CI
 
 on:
   push:
-    branches: [main]
+    branches: ["main", "feat/setup-test"]
   pull_request:
+    branches: ["main", "feat/setup-test"]
 
 jobs:
-  cypress-tests:
+  test-frontend:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout code
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
-      # 3️⃣ Install dependencies (trong folder frontend)
       - name: Install dependencies
-        run: npm install
-        working-directory: frontend
+        working-directory: ./frontend
+        run: npm ci
 
-      # 4️⃣ Run Cypress tests với reporter JUnit
-      - name: Run Cypress tests
-        run: npx cypress run --reporter junit --reporter-options "mochaFile=frontend/cypress/results/results-[hash].xml"
-        working-directory: frontend
-        continue-on-error: true   # để step upload vẫn chạy nếu test fail
+      - name: Run unit tests
+        working-directory: ./frontend
+        run: npm run test:unit
 
-      # 5️⃣ Upload Cypress videos (luôn chạy)
-      - name: Upload Cypress videos
-        if: always()
+      - name: Generate coverage report
+        working-directory: ./frontend
+        run: npm run test:coverage
+
+      - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-videos
-          path: frontend/cypress/videos/**/*.mp4
-
-      # 6️⃣ Upload Cypress screenshots (nếu test fail)
-      - name: Upload Cypress screenshots
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-screenshots
-          path: frontend/cypress/screenshots/**/*.png
-
-      # 7️⃣ Upload Cypress test reports (luôn chạy)
-      - name: Upload Cypress test reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-test-reports
-          path: frontend/cypress/results/**/*.xml
+          name: frontend-coverage
+          path: frontend/coverage/
