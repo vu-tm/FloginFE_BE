@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./frontend        # tất cả lệnh dưới đây sẽ chạy trong thư mục frontend
+        working-directory: ./frontend   # tất cả lệnh run đều chạy trong ./frontend
 
     steps:
       - name: Checkout repo
@@ -19,23 +19,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json   # cache nhanh hơn
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        run: npm ci                     # dùng npm ci nhanh & ổn định hơn npm install
+        run: npm ci
 
-      - name: Run Cypress tests
-        run: npx cypress run
-        continue-on-error: true         # để upload artifact dù test fail
+      # KHỞI ĐỘNG SERVER + CHẠY CYPRESS SONG SONG (quan trọng nhất)
+      - name: Cypress run with server
+        run: |
+          # Nếu bạn dùng npm start (Create React App) → dùng dòng này
+          npm start & 
 
-      # Upload video + screenshot dù pass hay fail
+          # Nếu bạn dùng Vite → dùng dòng dưới thay thế dòng trên
+          # npm run dev &
+
+          npx wait-on http-get://localhost:3000 -t 90000    # đợi server lên tối đa 90s
+          npx cypress run                                   # chạy Cypress khi server đã sẵn sàng
+
+      # Upload video + ảnh dù pass hay fail
       - name: Upload Cypress videos
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cypress-videos
-          path: cypress/videos/**/*.mp4     # đường dẫn tương đối với ./frontend
+          path: cypress/videos/**/*.mp4
 
       - name: Upload Cypress screenshots
         if: always()
