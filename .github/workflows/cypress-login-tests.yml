@@ -23,16 +23,33 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
-      - name: Run unit tests
+       # 1) Validation Test (frontend)
+      - name: Run Login Validation Tests
         working-directory: ./frontend
-        run: npm run test:unit
+        run: npm run test:validationFrontend
 
-      - name: Generate coverage report
+      # 2) Integration Test
+      - name: Run Login Integration Tests
         working-directory: ./frontend
-        run: npm run test:coverage
+        run: npm run test:loginIntegrationFrontend
 
-      - name: Upload coverage artifact
+      # 3) Mock Test
+      - name: Run Login Mock Tests
+        working-directory: ./frontend
+        run: npm run test:loginMockFrontend
+
+      # 4) E2E (Cypress)
+      - name: Install Cypress
+        working-directory: ./frontend
+        run: npx cypress install
+
+      - name: Run Login E2E Tests
+        working-directory: ./frontend
+        run: npm run test:e2eFrontend
+
+      # Upload ALL coverage results
+      - name: Upload Login Coverage Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-coverage
-          path: frontend/coverage/
+          name: login-coverage
+          path: frontend/coverage
