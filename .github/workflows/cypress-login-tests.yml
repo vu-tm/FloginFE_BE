@@ -31,9 +31,15 @@ jobs:
           path: cypress/screenshots
 
       - name: Upload Cypress videos
+        if: always()                                   # quan trọng: luôn chạy
         uses: actions/upload-artifact@v4
-        if: success() || failure()   # thêm dòng này để luôn chạy dù pass hay fail
         with:
           name: cypress-videos
-          path: cypress/videos
-          if-no-files-found: warn     # thêm dòng này để không lỗi khi chưa có video
+          path: cypress/videos/**/*.mp4                # bắt hết .mp4 ở mọi thư mục con
+
+      - name: Upload Cypress screenshots (nếu có fail)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots/**/*.png
