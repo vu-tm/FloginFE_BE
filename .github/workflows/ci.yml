@@ -7,7 +7,7 @@ on:
     branches: ["main", "feat/setup-test"]
 
 jobs:
-  test-frontend:
+  run-product-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -75,8 +75,8 @@ jobs:
         working-directory: ./frontend
         run: npm run test:coverage
         
-      - name: Upload Login Coverage Artifact
+      - name: Upload Product Coverage Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: login-coverage
+          name: product-coverage
           path: frontend/coverage
