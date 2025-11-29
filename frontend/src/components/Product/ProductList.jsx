@@ -18,6 +18,9 @@ export default function ProductList() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -38,12 +41,15 @@ export default function ProductList() {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true); // Bắt đầu loading
+        setError(""); // Reset lỗi cũ
         const data = await productService.getProducts();
         setProducts(data);
         setFilteredProducts(data);
       } catch (error) {
-        alert("Lỗi khi tải sản phẩm");
-        console.error("Lỗi khi tải sản phẩm:", error);
+        setError("Không tải được danh sách sản phẩm. Vui lòng thử lại!");
+      } finally {
+        setLoading(false); // Luôn tắt loading
       }
     }
     fetchData();
@@ -239,6 +245,32 @@ export default function ProductList() {
           </div>
         </div>
 
+        {/* LOADING STATE */}
+        {loading && (
+          <div className="text-center py-5 my-5">
+            <div
+              className="spinner-border text-primary"
+              role="status"
+              style={{ width: "3rem", height: "3rem" }}
+            >
+              <span className="visually-hidden">Đang tải...</span>
+            </div>
+            <p className="mt-3 fs-5 text-muted">
+              Đang tải danh sách sản phẩm...
+            </p>
+          </div>
+        )}
+
+        {/* ERROR STATE từ API (khác với errorMessage từ delete/create) */}
+        {!loading && error && (
+          <div className="alert alert-danger text-center py-4" role="alert">
+            <strong>Lỗi tải dữ liệu:</strong> {error}
+            <br />
+            <small>Vui lòng kiểm tra kết nối mạng và thử lại.</small>
+          </div>
+        )}
+
+        {/* SUCCESS & ERROR*/}
         {successMessage && (
           <div
             className="success-message"
@@ -273,106 +305,111 @@ export default function ProductList() {
           </div>
         )}
 
-        {/* Bảng sản phẩm */}
-        <div className="table-card">
-          <div className="table-wrapper">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Mã sản phẩm</th>
-                  <th>Tên sản phẩm</th>
-                  <th>Giá</th>
-                  <th>Số lượng</th>
-                  <th>Loại</th>
-                  <th className="text-right">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentItems.length > 0 ? (
-                  currentItems.map((product) => (
-                    <tr
-                      key={product.id}
-                      className="table-row-hover"
-                      data-testid="product-item"
-                    >
-                      <td>
-                        <div className="user-name">
-                          SP-{product.id.toString().padStart(3, "0")}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="user-name" data-testid="product-name">
-                          {product.name}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="user-name" data-testid="product-price">
-                          {formatPrice(product.price)}
-                        </div>
-                      </td>
-                      <td>
-                        <div
-                          className="user-name"
-                          data-testid="product-quantity"
-                        >
-                          {product.quantity}
-                        </div>
-                      </td>
-                      <td>
-                        <span className={`badge role-${product.category}`}>
-                          {getCategoryName(product.category)}
-                        </span>
-                      </td>
-                      <td className="action-cell">
-                        <div className="action-buttons">
-                          <button
-                            onClick={() => openDetail(product)}
-                            className="btn-icon"
-                            title="Xem chi tiết"
-                            data-testid="view-detail-btn"
+        {/* Bảng sản phẩm - chỉ hiển thị khi KHÔNG loading và KHÔNG có lỗi API */}
+        {!loading && !error && (
+          <div className="table-card">
+            <div className="table-wrapper">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Mã sản phẩm</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Loại</th>
+                    <th className="text-right">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.length > 0 ? (
+                    currentItems.map((product) => (
+                      <tr
+                        key={product.id}
+                        className="table-row-hover"
+                        data-testid="product-item"
+                      >
+                        <td>
+                          <div className="user-name">
+                            SP-{product.id.toString().padStart(3, "0")}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="user-name" data-testid="product-name">
+                            {product.name}
+                          </div>
+                        </td>
+                        <td>
+                          <div
+                            className="user-name"
+                            data-testid="product-price"
                           >
-                            <Eye className="icon-small" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setEditingProduct(product);
-                              setShowEditModal(true);
-                            }}
-                            className="btn-icon text-blue"
-                            title="Chỉnh sửa"
-                            data-testid="edit-product-btn"
+                            {formatPrice(product.price)}
+                          </div>
+                        </td>
+                        <td>
+                          <div
+                            className="user-name"
+                            data-testid="product-quantity"
                           >
-                            <Edit className="icon-small" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteProduct(product.id)}
-                            className="btn-icon text-red"
-                            title="Xóa"
-                            data-testid="delete-product-btn"
-                          >
-                            <Trash2 className="icon-small" />
-                          </button>
-                        </div>
+                            {product.quantity}
+                          </div>
+                        </td>
+                        <td>
+                          <span className={`badge role-${product.category}`}>
+                            {getCategoryName(product.category)}
+                          </span>
+                        </td>
+                        <td className="action-cell">
+                          <div className="action-buttons">
+                            <button
+                              onClick={() => openDetail(product)}
+                              className="btn-icon"
+                              title="Xem chi tiết"
+                              data-testid="view-detail-btn"
+                            >
+                              <Eye className="icon-small" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setEditingProduct(product);
+                                setShowEditModal(true);
+                              }}
+                              className="btn-icon text-blue"
+                              title="Chỉnh sửa"
+                              data-testid="edit-product-btn"
+                            >
+                              <Edit className="icon-small" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="btn-icon text-red"
+                              title="Xóa"
+                              data-testid="delete-product-btn"
+                            >
+                              <Trash2 className="icon-small" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="6"
+                        className="text-center py-4"
+                        style={{ color: "#6c757d" }}
+                      >
+                        {searchTerm || selectedCategory !== "all"
+                          ? "Không tìm thấy sản phẩm nào phù hợp"
+                          : "Không có sản phẩm nào"}
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan="6"
-                      className="text-center py-4"
-                      style={{ color: "#6c757d" }}
-                    >
-                      {searchTerm || selectedCategory !== "all"
-                        ? "Không tìm thấy sản phẩm nào phù hợp"
-                        : "Không có sản phẩm nào"}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Phân trang */}
         {totalPages > 1 && (
