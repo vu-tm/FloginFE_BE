@@ -1,0 +1,82 @@
+name: Complete CI/CD Pipeline
+
+on:
+  push:
+    branches: ["main", "feat/setup-test"]
+  pull_request:
+    branches: ["main", "feat/setup-test"]
+
+jobs:
+  run-product-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: mvn -q dependency:resolve
+
+      - name: Start Backend Server
+        working-directory: ./backend
+        run: |
+          mvn spring-boot:run &
+          sleep 10
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+       # 1) Validation Test (product)
+      - name: Run Product Validation Tests
+        working-directory: ./frontend
+        run: npm run test:productValidationFrontend
+
+      # 2) Integration Test
+      - name: Run ProductList Integration Tests
+        working-directory: ./frontend
+        run: npm run test:productListIntegrationFrontend
+        
+      - name: Run ProductForm Integration Tests
+        working-directory: ./frontend
+        run: npm run test:productFormIntegrationFrontend
+        
+      - name: Run ProductDetail Integration Tests
+        working-directory: ./frontend
+        run: npm run test:productDetailIntegrationFrontend
+
+      # 3) Mock Test
+      - name: Run Product Mock Tests
+        working-directory: ./frontend
+        run: npm run test:productMockFrontend
+
+      - name: Start Frontend Server
+        working-directory: ./frontend
+        run: |
+          npm start &
+          sleep 10
+            
+      # 4) E2E (Cypress)
+      - name: Install Cypress
+        working-directory: ./frontend
+        run: npx cypress install
+
+      - name: Run Product E2E Tests
+        working-directory: ./frontend
+        run: npm run test:e2eFrontendProduct
+
+      # Upload ALL coverage results
+      - name: Generate coverage report
+        working-directory: ./frontend
+        run: npm run test:coverage
+        
+      - name: Upload Product Coverage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: product-coverage
+          path: frontend/coverage

@@ -126,15 +126,19 @@ class ProductPage {
     getSearchResultsCount() {
         return cy.contains('Tìm thấy').invoke('text')
     }
+
     getNoResultsMessage() {
         return cy.contains('Không tìm thấy sản phẩm nào phù hợp')
     }
+
     getAllProductItems() {
         return cy.get('[data-testid="product-item"]')
     }
+
     getProductNameInRow($row) {
         return cy.wrap($row).find('[data-testid="product-name"]')
     }
+
     getProductCategoryInRow($row) {
         return cy.wrap($row).find('.badge')
     }
