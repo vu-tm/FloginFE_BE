@@ -38,6 +38,12 @@ jobs:
         working-directory: ./frontend
         run: npm run test:loginMockFrontend
 
+      - name: Start Frontend Server
+        working-directory: ./frontend
+        run: |
+          npm start &
+          sleep 10
+            
       # 4) E2E (Cypress)
       - name: Install Cypress
         working-directory: ./frontend
