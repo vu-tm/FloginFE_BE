@@ -10,93 +10,84 @@
 **/
 
 class LoginPage {
-    visit() {
-        cy.visit('http://localhost:3000')
-    }
+  visit() {
+    cy.visit('http://localhost:3000')
+  }
+  // --- Lấy các phần tử trên trang ---
+  getUsernameInput() {
+    return cy.get('[data-testid="username-input"]')
+  }
+  getPasswordInput() {
+    return cy.get('[data-testid="password-input"]')
+  }
+  getLoginButton() {
+    return cy.get('[data-testid="login-button"]')
+  }
+  getShowPasswordButton() {
+    return cy.get('[aria-label="show-password"]')
+  }
+  getUsernameError() {
+    return cy.get('[data-testid="username-error"]', { timeout: 5000 })
+  }
+  getPasswordError() {
+    return cy.get('[data-testid="password-error"]', { timeout: 5000 })
+  }
+  getLoginMessage() {
+    return cy.get('[data-testid="login-message"]', { timeout: 10000 })
+  }
 
-    // --- Lấy các phần tử trên trang ---
-    getUsernameInput() {
-        return cy.get('[data-testid="username-input"]')
+  // --- Các hành động trên trang Login ---
+  fillUsername(username) {
+    if (username === '') {
+      this.getUsernameInput().clear()
+    } else {
+      this.getUsernameInput().clear().type(username)
     }
+  }
 
-    getPasswordInput() {
-        return cy.get('[data-testid="password-input"]')
+  fillPassword(password) {
+    if (password === '') {
+      this.getPasswordInput().clear()
+    } else {
+      this.getPasswordInput().clear().type(password)
     }
+  }
 
-    getLoginButton() {
-        return cy.get('[data-testid="login-button"]')
+  fillLoginForm(username, password) {
+    if (username !== undefined) {
+      this.fillUsername(username)
     }
+    if (password !== undefined) {
+      this.fillPassword(password)
+    }
+  }
 
-    getShowPasswordButton() {
-        return cy.get('[aria-label="show-password"]')
-    }
+  clickLogin() {
+    this.getLoginButton().click()
+  }
 
-    getUsernameError() {
-        return cy.get('[data-testid="username-error"]', { timeout: 5000 })
-    }
+  togglePasswordVisibility() {
+    this.getShowPasswordButton().click()
+  }
 
-    getPasswordError() {
-        return cy.get('[data-testid="password-error"]', { timeout: 5000 })
-    }
+  // --- Helper methods ---
+  login(username, password) {
+    this.fillLoginForm(username, password)
+    this.clickLogin()
+  }
 
-    getLoginMessage() {
-        return cy.get('[data-testid="login-message"]', { timeout: 10000 })
-    }
+  verifyRedirectToDashboard() {
+    cy.url().should('include', '/products')
+  }
 
-    // --- Các hành động trên trang Login ---
-    fillUsername(username) {
-        // Xử lý trường hợp username rỗng
-        if (username === '') {
-            this.getUsernameInput().clear()
-        } else {
-            this.getUsernameInput().clear().type(username)
-        }
-    }
-    
-    fillPassword(password) {
-        // Xử lý trường hợp password rỗng
-        if (password === '') {
-            this.getPasswordInput().clear()
-        } else {
-            this.getPasswordInput().clear().type(password)
-        }
-    }
+  verifyPasswordType(type) {
+    this.getPasswordInput().should('have.attr', 'type', type)
+  }
 
-    fillLoginForm(username, password) {
-        if (username !== undefined) {
-            this.fillUsername(username)
-        }
-        if (password !== undefined) {
-            this.fillPassword(password)
-        }
-    }
-
-    clickLogin() {
-        this.getLoginButton().click()
-    }
-
-    togglePasswordVisibility() {
-        this.getShowPasswordButton().click()
-    }
-
-    // --- Helper methods ---
-    login(username, password) {
-        this.fillLoginForm(username, password)
-        this.clickLogin()
-    }
-
-    verifyRedirectToDashboard() {
-        cy.url().should('include', '/products')
-    }
-
-    verifyPasswordType(type) {
-        this.getPasswordInput().should('have.attr', 'type', type)
-    }
-
-    clearForm() {
-        this.getUsernameInput().clear()
-        this.getPasswordInput().clear()
-    }
+  clearForm() {
+    this.getUsernameInput().clear()
+    this.getPasswordInput().clear()
+  }
 }
 
 export default LoginPage

@@ -100,52 +100,41 @@ class ProductPage {
     closeDetailModal() {
         cy.get('.btn-close-detail').click()
     }
-
     confirmDelete() {
         cy.on('window:confirm', () => true)
     }
-
     cancelDelete() {
         cy.on('window:confirm', () => false)
     }
-
     // --- Helper methods ---
     getProductInList(name) {
         return cy.contains('[data-testid="product-item"]', name, { timeout: 10000 })
     }
-
     // --- SEARCH/FILTER METHODS ---
     searchProduct(searchTerm) {
         cy.get('input[type="text"]')
             .clear()
             .type(searchTerm)
     }
-
     clearSearch() {
         cy.get('input[type="text"]')
             .clear()
     }
-
     filterByCategory(category) {
         cy.get('select').select(category)
     }
-
     getSearchResultsCount() {
         return cy.contains('Tìm thấy').invoke('text')
     }
-
     getNoResultsMessage() {
         return cy.contains('Không tìm thấy sản phẩm nào phù hợp')
     }
-
     getAllProductItems() {
         return cy.get('[data-testid="product-item"]')
     }
-
     getProductNameInRow($row) {
         return cy.wrap($row).find('[data-testid="product-name"]')
     }
-
     getProductCategoryInRow($row) {
         return cy.wrap($row).find('.badge')
     }

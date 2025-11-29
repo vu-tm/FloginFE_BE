@@ -26,6 +26,7 @@
     "test:loginIntegrationFrontend": "react-scripts test --coverage --watchAll=false --collectCoverageFrom=src/components/Login/Login.jsx --collectCoverageFrom=src/utils/loginValidation.js src/tests/integration/login.integration.test.js",
     "test:e2eFrontend": "cypress run --spec cypress/e2e/login.cy.js",
     "test:loginMockFrontend": "react-scripts test --coverage --watchAll=false --collectCoverageFrom=src/components/Login/Login.jsx src/tests/mock/login.mock.test.js",
+    
     "test:productValidationFrontend": "react-scripts test --coverage --watchAll=false --testPathPattern=productValidation --collectCoverageFrom=src/utils/productValidation.js",
     "test:productFormFrontend": "react-scripts test --watchAll=false src/tests/ProductForm.test.js",
     "test:productDetailIntegrationFrontend": "react-scripts test --watchAll=false src/tests/ProductDetail.integration.test.js",

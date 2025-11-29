@@ -188,7 +188,7 @@ describe('Login E2E Tests - Professional', () => {
             loginPage.verifyRedirectToDashboard()
         })
 
-        it('TC15 [Session Persistence] - Nên lưu localStorage sau khi login', () => {
+        it('TC15 [LocalStorage Persistence] - Nên lưu localStorage sau khi login', () => {
             loginPage.login(validCredentials.username, validCredentials.password)
             cy.wait(1000)
 
