@@ -10,39 +10,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repo
-      - name: Checkout repo
+      # 1️⃣ Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Setup Node.js
+      # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      # Install dependencies trong frontend
+      # 3️⃣ Install dependencies (trong folder frontend)
       - name: Install dependencies
         run: npm install
         working-directory: frontend
 
-      # Run Cypress tests trong frontend
+      # 4️⃣ Run Cypress tests với reporter JUnit
       - name: Run Cypress tests
-        run: npx cypress run
+        run: npx cypress run --reporter junit --reporter-options "mochaFile=frontend/cypress/results/results-[hash].xml"
         working-directory: frontend
-        continue-on-error: true   # để step upload vẫn chạy dù test fail
+        continue-on-error: true   # để step upload vẫn chạy nếu test fail
 
-      # Upload video Cypress (luôn chạy)
+      # 5️⃣ Upload Cypress videos (luôn chạy)
       - name: Upload Cypress videos
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cypress-videos
-          path: frontend/cypress/videos/**/*.mp4   # chú ý path từ root repo
+          path: frontend/cypress/videos/**/*.mp4
 
-      # Upload screenshot Cypress nếu test fail
-      - name: Upload Cypress screenshots (nếu có fail)
+      # 6️⃣ Upload Cypress screenshots (nếu test fail)
+      - name: Upload Cypress screenshots
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: cypress-screenshots
           path: frontend/cypress/screenshots/**/*.png
+
+      # 7️⃣ Upload Cypress test reports (luôn chạy)
+      - name: Upload Cypress test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-test-reports
+          path: frontend/cypress/results/**/*.xml
