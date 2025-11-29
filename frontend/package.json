@@ -25,7 +25,10 @@
     "test:validationFrontend": "react-scripts test --coverage --watchAll=false --testPathPattern=loginValidation --collectCoverageFrom=src/utils/loginValidation.js",
     "test:loginIntegrationFrontend": "react-scripts test --coverage --watchAll=false --collectCoverageFrom=src/components/Login/Login.jsx --collectCoverageFrom=src/utils/loginValidation.js src/tests/integration/login.integration.test.js",
     "test:e2eFrontend": "cypress run --spec cypress/e2e/login.cy.js",
-    "test:loginMockFrontend": "react-scripts test --coverage --watchAll=false --collectCoverageFrom=src/components/Login/Login.jsx src/tests/mock/login.mock.test.js"
+    "test:loginMockFrontend": "react-scripts test --coverage --watchAll=false --collectCoverageFrom=src/components/Login/Login.jsx src/tests/mock/login.mock.test.js",
+  
+    "test:e2eFrontendProduct": "cypress run --spec cypress/e2e/product.cy.js"
+  
   },
   "browserslist": {
     "production": [
