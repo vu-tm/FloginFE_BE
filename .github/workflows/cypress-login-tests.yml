@@ -1,12 +1,16 @@
 name: Run Login Tests
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
 
 jobs:
   cypress-tests:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend        # tất cả lệnh dưới đây sẽ chạy trong thư mục frontend
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -15,29 +19,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json   # cache nhanh hơn
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci                     # dùng npm ci nhanh & ổn định hơn npm install
 
       - name: Run Cypress tests
         run: npx cypress run
-        continue-on-error: true   # để step upload vẫn chạy dù test fail
+        continue-on-error: true         # để upload artifact dù test fail
 
-      - name: Upload Cypress screenshots
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots
-
+      # Upload video + screenshot dù pass hay fail
       - name: Upload Cypress videos
-        if: always()                                   # quan trọng: luôn chạy
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cypress-videos
-          path: cypress/videos/**/*.mp4                # bắt hết .mp4 ở mọi thư mục con
+          path: cypress/videos/**/*.mp4     # đường dẫn tương đối với ./frontend
 
-      - name: Upload Cypress screenshots (nếu có fail)
+      - name: Upload Cypress screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
