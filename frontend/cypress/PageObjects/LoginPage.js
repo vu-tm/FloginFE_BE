@@ -52,7 +52,7 @@ class LoginPage {
             this.getUsernameInput().clear().type(username)
         }
     }
-
+    
     fillPassword(password) {
         // Xử lý trường hợp password rỗng
         if (password === '') {

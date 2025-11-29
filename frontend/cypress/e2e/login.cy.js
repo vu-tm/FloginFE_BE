@@ -3,7 +3,7 @@ import LoginPage from '../PageObjects/LoginPage.js'
 describe('Login E2E Tests - Professional', () => {
     const loginPage = new LoginPage()
 
-    const validCredentials = {
+    const validCredentials = { // User hợp lệ
         username: 'testuser',
         password: 'Test@123'
     }
@@ -188,7 +188,7 @@ describe('Login E2E Tests - Professional', () => {
             loginPage.verifyRedirectToDashboard()
         })
 
-        it('TC15 [Session Persistence] - Nên lưu session sau khi login', () => {
+        it('TC15 [Session Persistence] - Nên lưu localStorage sau khi login', () => {
             loginPage.login(validCredentials.username, validCredentials.password)
             cy.wait(1000)
 
