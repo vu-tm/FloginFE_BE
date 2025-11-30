@@ -1,6 +1,9 @@
-const VALID_CATEGORIES = ["electronics", "clothing", "food", "books"];
+const VALID_CATEGORIES = ["electronics", "food", "model"];
+import { sanitizeProduct } from './sanitization';
 
 export const validateProduct = (product) => {
+  // Sanitize trước khi validate
+  const sanitizedProduct = sanitizeProduct(product);
   const errors = {};
 
   // Tên sản phẩm

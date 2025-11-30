@@ -93,10 +93,10 @@ export default function ProductForm({
 
     const submittedProduct = {
       ...(isCreate ? {} : { id: initialProduct.id }),
-      name: formData.name.trim(),
+      name: formData.name.trim().replace(/\s+/g, ' '), // Sanitize tên
       price: Number(formData.price) || 0,
       quantity: Number(formData.quantity) || 0,
-      category: formData.category,
+      category: formData.category.trim(), // Sanitize category
     };
 
     onSubmit(submittedProduct);
