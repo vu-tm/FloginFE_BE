@@ -3,6 +3,7 @@ package com.flogin.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,8 +32,51 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, JWTTokenFilterService tokenFilterService)
             throws Exception {
         http
+
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOrigins(List.of("http://localhost:3000")); // frontend origin
+                    config.setAllowedHeaders(List.of("*"));
+                    String path = request.getRequestURI();
+                    if (path.startsWith("/api/login")) {
+                        config.setAllowedMethods(List.of("POST"));
+                    } else {
+                        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                    }
+                    return config;
+                }))
+                .headers(headers -> headers
+                        // HSTS – Strict-Transport-Security (bắt buộc HTTPS)
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .maxAgeInSeconds(31536000) // 1 năm
+                                .includeSubDomains(true)
+                                .preload(true))
+
+                        // X-Content-Type-Options: nosniff
+                        .contentTypeOptions(Customizer.withDefaults())
+                        // X-Frame-Options: DENY (chặn clickjacking)
+                        .frameOptions(frame -> frame.deny())
+                        // Content-Security-Policy (rất mạnh, nhưng vẫn cho phép React chạy ngon)
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives(
+                                        "default-src 'self'; " +
+                                                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; "
+                                                +
+                                                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+                                                "img-src 'self' data: https:; " +
+                                                "font-src 'self' https://fonts.gstatic.com; " +
+                                                "connect-src 'self' http://localhost:8080 ws://localhost:8080; " +
+                                                "frame-ancestors 'none'; " +
+                                                "base-uri 'self'; " +
+                                                "form-action 'self'; " +
+                                                "upgrade-insecure-requests"))
+
+                        // Permissions-Policy (tắt các tính năng nguy hiểm)
+                        .permissionsPolicy(permissions -> permissions
+                                .policy("camera=(), microphone=(), geolocation=(), payment=()")))
+
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(
                         (request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
@@ -47,22 +91,22 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated())
 
-                .addFilterBefore(tokenFilterService, UsernamePasswordAuthenticationFilter.class)
-                .headers(headers -> headers.frameOptions().sameOrigin());
+                .addFilterBefore(tokenFilterService, UsernamePasswordAuthenticationFilter.class);
+        // .headers(headers -> headers.frameOptions().sameOrigin());
 
         return http.build();
     }
 
-    // 4. CORS config chuẩn dev + production (Vercel/Netlify)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of(
-                "http://localhost:*", // dev tất cả port
+                "http://localhost:*",
                 "http://127.0.0.1:*",
-                "https://*.vercel.app", // khi deploy frontend
+                "https://*.vercel.app",
                 "https://*.netlify.app",
-                "https://flogin-fe-be.vercel.app" // tên dự án của bạn (nếu có)
+                "https://flogin-fe-be.vercel.app"
+
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
@@ -73,7 +117,6 @@ public class SecurityConfig {
         return source;
     }
 
-    // 5. Password hashing BCrypt – đã có, giữ nguyên
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
