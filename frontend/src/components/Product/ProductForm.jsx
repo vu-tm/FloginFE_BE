@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import "./ProductList.css";
+import { validateProduct } from "../../utils/productValidation";
 
 export default function ProductForm({
   mode, // 'create' | 'edit'
@@ -18,11 +19,31 @@ export default function ProductForm({
     category: initialProduct?.category || "model",
   });
 
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
   const handleChange = (field) => (e) => {
+    const value = e.target.value;
     setFormData((prev) => ({
       ...prev,
-      [field]: e.target.value,
+      [field]: value,
     }));
+
+    if (touched[field]) {
+      const newErrors = validateProduct({
+        ...formData,
+        [field]: value
+      });
+      setErrors(newErrors);
+    }
+  };
+
+  const handleBlur = (field) => () => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+
+    // Validate field khi blur
+    const newErrors = validateProduct(formData);
+    setErrors(newErrors);
   };
 
   // const handleSubmit = (e) => {
@@ -53,10 +74,21 @@ export default function ProductForm({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // KIỂM TRA FORM HỢP LỆ TRƯỚC KHI GỌI onSubmit
-    if (!e.target.checkValidity()) {
-      e.target.reportValidity(); // hiện thông báo lỗi của browser (tốt cho UX)
-      return; // DỪNG LẠI, KHÔNG gọi onSubmit
+    // Mark all fields as touched
+    setTouched({
+      name: true,
+      price: true,
+      quantity: true,
+      category: true,
+    });
+
+    // Validate form
+    const validationErrors = validateProduct(formData);
+    setErrors(validationErrors);
+
+    // Nếu có lỗi, dừng lại
+    if (Object.keys(validationErrors).length > 0) {
+      return;
     }
 
     const submittedProduct = {
@@ -79,6 +111,13 @@ export default function ProductForm({
     }
   };
 
+  // Helper function để xác định class cho input
+  const getInputClassName = (field) => {
+    const baseClass = "input";
+    if (!touched[field]) return baseClass;
+    return errors[field] ? `${baseClass} input-error` : baseClass;
+  };
+
   const title = isCreate ? "Thêm sản phẩm mới" : "Chỉnh sửa sản phẩm";
   const submitLabel = isCreate ? "Thêm" : "Cập nhật";
 
@@ -92,7 +131,7 @@ export default function ProductForm({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <div className="modal-body">
             <div className="form-grid">
               <div>
@@ -107,20 +146,25 @@ export default function ProductForm({
                 />
               </div>
 
-              <div>
+              <div className="input-group">
                 <label>Tên sản phẩm *</label>
                 <input
                   type="text"
                   placeholder="Nhập tên sản phẩm"
                   value={formData.name}
                   onChange={handleChange("name")}
-                  className="input"
-                  required
+                  onBlur={handleBlur("name")}
+                  className={getInputClassName("name")}
                   data-testid="product-name"
                 />
+                {touched.name && errors.name && (
+                  <span className="error-text" data-testid="name-error">
+                    {errors.name}
+                  </span>
+                )}
               </div>
 
-              <div>
+              <div className="input-group">
                 <label>Giá *</label>
                 <input
                   type="number"
@@ -128,13 +172,18 @@ export default function ProductForm({
                   placeholder="Nhập giá"
                   value={formData.price}
                   onChange={handleChange("price")}
-                  className="input"
-                  required
+                  onBlur={handleBlur("price")}
+                  className={getInputClassName("price")}
                   data-testid="product-price"
                 />
+                {touched.price && errors.price && (
+                  <span className="error-text" data-testid="price-error">
+                    {errors.price}
+                  </span>
+                )}
               </div>
 
-              <div>
+              <div className="input-group">
                 <label>Số lượng *</label>
                 <input
                   type="number"
@@ -142,26 +191,37 @@ export default function ProductForm({
                   placeholder="Nhập số lượng"
                   value={formData.quantity}
                   onChange={handleChange("quantity")}
-                  className="input"
-                  required
+                  onBlur={handleBlur("quantity")}
+                  className={getInputClassName("quantity")}
                   data-testid="product-quantity"
                 />
+                {touched.quantity && errors.quantity && (
+                  <span className="error-text" data-testid="quantity-error">
+                    {errors.quantity}
+                  </span>
+                )}
               </div>
             </div>
 
             <div className="form-grid">
-              <div>
+              <div className="input-group">
                 <label>Loại *</label>
                 <select
                   value={formData.category}
                   onChange={handleChange("category")}
-                  className="input"
-                  required
+                  onBlur={handleBlur("category")}
+                  className={getInputClassName("category")}
                 >
+                  <option value="">Chọn loại sản phẩm</option>
                   <option value="electronics">Điện tử</option>
                   <option value="food">Thức ăn</option>
                   <option value="model">Mô hình</option>
                 </select>
+                {touched.category && errors.category && (
+                  <span className="error-text" data-testid="category-error">
+                    {errors.category}
+                  </span>
+                )}
               </div>
             </div>
           </div>

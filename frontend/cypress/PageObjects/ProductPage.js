@@ -142,6 +142,25 @@ class ProductPage {
     getProductCategoryInRow($row) {
         return cy.wrap($row).find('.badge')
     }
+
+    // --- VALIDATION ERROR METHODS ---
+    getFieldError(field) {
+        return cy.get(`[data-testid="${field}-error"]`)
+    }
+
+    shouldShowFieldError(field, expectedError) {
+        this.getFieldError(field)
+            .should('be.visible')
+            .and('contain', expectedError)
+    }
+
+    shouldNotShowFieldError(field) {
+        this.getFieldError(field).should('not.exist')
+    }
+
+    getErrorInput(field) {
+        return cy.get(`[data-testid="${field}-error"]`).prev()
+    }
 }
 
 export default ProductPage
