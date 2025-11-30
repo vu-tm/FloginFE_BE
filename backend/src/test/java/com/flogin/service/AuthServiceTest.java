@@ -1,22 +1,39 @@
 package com.flogin.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.flogin.dto.LoginRequest;
 import com.flogin.dto.LoginResponse;
+import com.flogin.entity.User;
+import com.flogin.repository.UserRepository;
 
-
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @DisplayName("Login Service Unit Tests")
 public class AuthServiceTest {
 
-    @Autowired
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private TokenService tokenService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @InjectMocks
     private AuthService authService;
 
     @Test
@@ -26,7 +43,13 @@ public class AuthServiceTest {
         LoginRequest request = new LoginRequest(
             "testuser", "Test@123"
         );
-        
+
+        User user = new User("testuser", "hashedPassword", "testuser@example.com");
+
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+        when(tokenService.generateToken(any())).thenReturn("mockToken123");
+
         LoginResponse response = authService.authenticate(request);
 
         assertTrue(response.isSuccess());
@@ -54,6 +77,12 @@ public class AuthServiceTest {
         LoginRequest request = new LoginRequest(
             "testuser", "Test@456"
         );
+
+        
+        User user = new User("testuser", "hashedPassword", "testuser@example.com");
+
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
         LoginResponse response = authService.authenticate(request);
 
@@ -185,7 +214,7 @@ public class AuthServiceTest {
         LoginResponse response = authService.authenticate(request);
         
         assertFalse(response.isSuccess());
-        assertEquals("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet", response.getMessage());
+        assertEquals("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet va khong chua khoang trang", response.getMessage());
         assertNull(response.getToken());
         assertNull(response.getUser());
     }
@@ -201,7 +230,7 @@ public class AuthServiceTest {
         LoginResponse response = authService.authenticate(request);
         
         assertFalse(response.isSuccess());
-        assertEquals("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet", response.getMessage());
+        assertEquals("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet va khong chua khoang trang", response.getMessage());
         assertNull(response.getToken());
         assertNull(response.getUser());
     }
@@ -217,7 +246,7 @@ public class AuthServiceTest {
         LoginResponse response = authService.authenticate(request);
         
         assertFalse(response.isSuccess());
-        assertEquals("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet", response.getMessage());
+        assertEquals("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet va khong chua khoang trang", response.getMessage());
         assertNull(response.getToken());
         assertNull(response.getUser());
     }
@@ -233,7 +262,7 @@ public class AuthServiceTest {
         LoginResponse response = authService.authenticate(request);
         
         assertFalse(response.isSuccess());
-        assertEquals("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet", response.getMessage());
+        assertEquals("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet va khong chua khoang trang", response.getMessage());
         assertNull(response.getToken());
         assertNull(response.getUser());
     }
@@ -249,7 +278,7 @@ public class AuthServiceTest {
         LoginResponse response = authService.authenticate(request);
          
         assertFalse(response.isSuccess());
-        assertEquals("Password chua khoang trang", response.getMessage());
+        assertEquals("Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet va khong chua khoang trang", response.getMessage());
         assertNull(response.getToken());
         assertNull(response.getUser());
     }
