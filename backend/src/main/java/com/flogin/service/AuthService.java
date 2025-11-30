@@ -37,10 +37,8 @@ public class AuthService {
             return new LoginResponse(false, "Password bi bo trong", null, null);
         if (request.getPassword().length() < 6 || request.getPassword().length() > 100)
             return new LoginResponse(false, "Do dai password khong hop le", null, null);
-        if (!request.getPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+{}\\[\\]:;<>,.?~\\\\/-]).+$"))
-            return new LoginResponse(false, "Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet", null, null);
-        if (request.getPassword().contains(" "))
-            return new LoginResponse(false, "Password chua khoang trang", null, null);
+        if (!request.getPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+{}\\[\\]:;<>,.?~\\\\/-])[\\S]+$"))
+            return new LoginResponse(false, "Password phai chua it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so va 1 ki tu dac biet va khong chua khoang trang", null, null);
 
         //Truy xuất database
         User user = userRepository.findById(request.getUsername())

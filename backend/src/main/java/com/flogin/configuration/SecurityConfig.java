@@ -31,8 +31,17 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> {
                             CorsConfiguration config = new CorsConfiguration();
                             config.setAllowedOrigins(List.of("http://localhost:3000")); // frontend origin
-                            config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                             config.setAllowedHeaders(List.of("*"));
+
+                            String path = request.getRequestURI();
+
+                            if (path.startsWith("/api/login")) {
+                                // AuthController: Cho phep post va options cho preflight
+                                config.setAllowedMethods(List.of("POST"));
+                            } else {
+                                // ProductController: cho phep moi methods va preflight
+                                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                            }
                             return config;
                         }))
                 .csrf(csrf -> csrf

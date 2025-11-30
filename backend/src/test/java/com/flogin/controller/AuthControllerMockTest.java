@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.flogin.dto.LoginResponse;
 import com.flogin.dto.UserDto;
 import com.flogin.service.AuthService;
-import com.flogin.service.TokenService;
 
 @WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -27,9 +26,6 @@ public class AuthControllerMockTest {
 
     @MockBean
     private AuthService authService;
-    
-    @MockBean
-    private TokenService tokenService;
 
     @Test
     @DisplayName("Mock: Controller voi mocked service success")
