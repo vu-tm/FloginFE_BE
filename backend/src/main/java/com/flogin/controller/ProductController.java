@@ -3,15 +3,20 @@ package com.flogin.controller;
 // import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import com.flogin.dto.ProductDto;
 import com.flogin.service.ProductService;
 
+import jakarta.validation.Valid;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/products") // GET /api/products                           
+@RequestMapping("/api/products") // GET /api/products
 @CrossOrigin(origins = "*") // Cho phép tất cả domain truy cập
 public class ProductController {
 
@@ -28,37 +33,88 @@ public class ProductController {
         // @RequestBody -> Post / Put
         // ========================================================================
 
-        // CREATE - Tạo sản phẩm mới
+        /// CREATE - Tạo sản phẩm mới
         @PostMapping
-        public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
-                return new ResponseEntity<>(productService.createProduct(productDto), null, HttpStatus.CREATED);
+        public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDto productDto,
+                        BindingResult bindingResult) {
+                // Kiểm tra lỗi validation
+                if (bindingResult.hasErrors()) {
+                        Map<String, String> errors = bindingResult.getFieldErrors()
+                                        .stream()
+                                        .collect(Collectors.toMap(
+                                                        FieldError::getField,
+                                                        FieldError::getDefaultMessage));
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+                }
+
+                try {
+                        ProductDto createdProduct = productService.createProduct(productDto);
+                        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
+                } catch (Exception e) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body(Map.of("error", e.getMessage()));
+                }
         }
 
-        // READ ALL - Lấy tât cả sản phẩm
+        // READ ALL - Lấy tất cả sản phẩm
         @GetMapping
         public ResponseEntity<List<ProductDto>> getAllProducts() {
-                return new ResponseEntity<>(productService.getAllProducts(), null, HttpStatus.OK);
+                try {
+                        List<ProductDto> products = productService.getAllProducts();
+                        return new ResponseEntity<>(products, HttpStatus.OK);
+                } catch (Exception e) {
+                        return new ResponseEntity<>(Collections.emptyList(), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
         }
 
         // READ ONE - Lấy sản phẩm theo ID
         @GetMapping("/{id}")
-        public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
-                return new ResponseEntity<>(productService.getProduct(id), null, HttpStatus.OK);
+        public ResponseEntity<?> getProductById(@PathVariable Long id) {
+                try {
+                        ProductDto product = productService.getProduct(id);
+                        return new ResponseEntity<>(product, HttpStatus.OK);
+                } catch (RuntimeException e) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                        .body(Map.of("error", e.getMessage()));
+                }
         }
 
-        // UPDATE - Cập nhập sản phẩm
+        // UPDATE - Cập nhật sản phẩm
         @PutMapping("/{id}")
-        public ResponseEntity<ProductDto> updateProduct(
+        public ResponseEntity<?> updateProduct(
                         @PathVariable Long id,
-                        @RequestBody ProductDto productDto) {
-                return new ResponseEntity<>(productService.updateProduct(id, productDto), null, HttpStatus.OK);
+                        @Valid @RequestBody ProductDto productDto,
+                        BindingResult bindingResult) {
+
+                // Kiểm tra lỗi validation
+                if (bindingResult.hasErrors()) {
+                        Map<String, String> errors = bindingResult.getFieldErrors()
+                                        .stream()
+                                        .collect(Collectors.toMap(
+                                                        FieldError::getField,
+                                                        FieldError::getDefaultMessage));
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+                }
+
+                try {
+                        ProductDto updatedProduct = productService.updateProduct(id, productDto);
+                        return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
+                } catch (RuntimeException e) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                        .body(Map.of("error", e.getMessage()));
+                }
         }
 
-        // DELTE - Xoá sản phẩm
+        // DELETE - Xóa sản phẩm
         @DeleteMapping("/{id}")
-        public ResponseEntity<ProductDto> deleteProduct(@PathVariable Long id) {
-                productService.deleteProduct(id);
-                return new ResponseEntity<>(null, null, HttpStatus.NO_CONTENT);
+        public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+                try {
+                        productService.deleteProduct(id);
+                        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                } catch (RuntimeException e) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                        .body(Map.of("error", e.getMessage()));
+                }
         }
 
         // // READ ALL - Lấy tât cả sản phẩm với phân trang
