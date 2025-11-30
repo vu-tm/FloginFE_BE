@@ -46,6 +46,7 @@ public class SecurityConfig {
                         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                     }
                     return config;
+                    //Khong su dung cookie de luu token, khong can setAllowCredentials(true)
                 }))
                 .headers(headers -> headers
                         // HSTS – Strict-Transport-Security (bắt buộc HTTPS)
@@ -95,26 +96,6 @@ public class SecurityConfig {
         // .headers(headers -> headers.frameOptions().sameOrigin());
 
         return http.build();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of(
-                "http://localhost:*",
-                "http://127.0.0.1:*",
-                "https://*.vercel.app",
-                "https://*.netlify.app",
-                "https://flogin-fe-be.vercel.app"
-
-        ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // BẮT BUỘC để gửi cookie/token
-
-        var source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
     }
 
     @Bean
