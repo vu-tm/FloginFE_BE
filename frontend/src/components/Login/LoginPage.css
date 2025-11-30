@@ -6,10 +6,12 @@ html {
 }
 
 .form-container {
-  width: 100%;
-  max-width: 360px; /* 👈 Giới hạn độ rộng tối đa */
-  margin: 0 auto; /* Căn giữa form */
-  text-align: center;
+    width: 100%;
+    max-width: 360px;
+    /* 👈 Giới hạn độ rộng tối đa */
+    margin: 0 auto;
+    /* Căn giữa form */
+    text-align: center;
 }
 
 /* Container chính */
@@ -112,10 +114,15 @@ html {
 }
 
 .error-text {
+    position: absolute;
+    top: 100%;
+    left: 0;
     margin-top: 0.25rem;
     font-size: 0.875rem;
     color: #dc2626;
     /* text-red-600 */
+    text-align: left;
+    display: block;
 }
 
 .password-wrapper {
@@ -191,5 +198,61 @@ html {
 @keyframes spin {
     to {
         transform: rotate(360deg);
+    }
+}
+
+.input-error {
+    border-color: #dc2626 !important;
+    /* border-red-600 */
+}
+
+.error-text {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc2626;
+    /* text-red-600 */
+    text-align: left;
+    display: block;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 0.5rem;
+}
+
+/* Focus state cho input có lỗi */
+.input-error:focus {
+    border-color: #dc2626;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+}
+
+/* Success state (tùy chọn) */
+.input-success {
+    border-color: #16a34a;
+    /* border-green-600 */
+}
+
+.success-text {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #16a34a;
+    /* text-green-600 */
+}
+
+/* Animation cho error message */
+.error-text {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

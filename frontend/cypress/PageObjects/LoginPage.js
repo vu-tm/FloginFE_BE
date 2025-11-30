@@ -11,7 +11,7 @@
 
 class LoginPage {
   visit() {
-    cy.visit('http://localhost:3000')
+    cy.visit('http://localhost:3000/login')
   }
   // --- Lấy các phần tử trên trang ---
   getUsernameInput() {
