@@ -480,16 +480,6 @@ export default function ProductList() {
             onCancel={() => setShowCreateModal(false)}
             onSubmit={async (product) => {
               try {
-                // Kiểm tra trùng tên trước khi thêm
-                const isDuplicate = products.some(p =>
-                  p.name.toLowerCase().trim() === product.name.toLowerCase().trim()
-                );
-
-                if (isDuplicate) {
-                  showAlert("Tên sản phẩm đã tồn tại. Vui lòng chọn tên khác!", "error");
-                  return; // Không thực hiện thêm nếu trùng
-                }
-
                 const newProductFromApi = await productService.createProduct(
                   product
                 );
@@ -497,11 +487,7 @@ export default function ProductList() {
                 setShowCreateModal(false);
                 showAlert("Thêm sản phẩm thành công");
               } catch (err) {
-                // Xử lý lỗi từ API (bao gồm cả lỗi trùng tên từ server)
-                const errorMsg = err.message?.includes("tên") || err.response?.status === 409
-                  ? "Tên sản phẩm đã tồn tại. Vui lòng chọn tên khác!"
-                  : "Thêm sản phẩm thất bại";
-                showAlert(errorMsg, "error");
+                showAlert("Thêm sản phẩm thất bại", "error");
               }
             }}
           />
