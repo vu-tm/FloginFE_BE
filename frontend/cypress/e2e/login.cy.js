@@ -53,7 +53,7 @@ describe('Login E2E Tests - Professional', () => {
 
             // Kiểm tra thông báo thành công
             cy.on('window:alert', (text) => {
-                expect(text).to.contains('thành công')
+                expect(text).to.contains('Login thanh cong')
             })
 
             // Kiểm tra chuyển hướng
@@ -71,7 +71,7 @@ describe('Login E2E Tests - Professional', () => {
             cy.wait(500)
 
             cy.on('window:alert', (text) => {
-                expect(text).to.not.contains('thanh cong')
+                expect(text).to.not.contains('Login thanh cong')
             })
 
             // Không chuyển trang

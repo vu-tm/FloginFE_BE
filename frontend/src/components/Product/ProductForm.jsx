@@ -212,10 +212,9 @@ export default function ProductForm({
                   onBlur={handleBlur("category")}
                   className={getInputClassName("category")}
                 >
-                  <option value="">Chọn loại sản phẩm</option>
+                  <option value="model">Mô hình</option>
                   <option value="electronics">Điện tử</option>
                   <option value="food">Thức ăn</option>
-                  <option value="model">Mô hình</option>
                 </select>
                 {touched.category && errors.category && (
                   <span className="error-text" data-testid="category-error">

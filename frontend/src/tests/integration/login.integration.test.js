@@ -101,7 +101,10 @@ describe("Login Component - Error handling & success messages", () => {
             render(<Login />)
             const btnLogin = screen.getByTestId("login-button");
             fireEvent.click(btnLogin);
-            expect(global.alert).toHaveBeenCalledWith("Ten dang nhap khong duoc de trong");
+
+            const errorSpan = screen.getByTestId("username-error");
+            expect(errorSpan).toBeInTheDocument();
+            expect(errorSpan.textContent).toBe("Ten dang nhap khong duoc de trong");
         });
     test("Hiển thị thông báo với trường hợp kiểm tra validationUsername thất bại - Trường hợp chứa ký tự đặc biệt",
         () => {
@@ -110,7 +113,10 @@ describe("Login Component - Error handling & success messages", () => {
             const btnLogin = screen.getByTestId("login-button");
             fireEvent.change(usernameInput, { target: { value: "A#d%min" } })
             fireEvent.click(btnLogin);
-            expect(global.alert).toHaveBeenCalledWith('Username chi chua cac ky tu a-z, A-Z, 0-9 và "_"');
+
+            const errorSpan = screen.getByTestId("username-error");
+            expect(errorSpan).toBeInTheDocument();
+            expect(errorSpan.textContent).toBe('Username chi chua cac ky tu a-z, A-Z, 0-9 và "_"');
         });
     test("Hiển thị thông báo với trường hợp kiểm tra validationUsername thất bại - Trường hợp username quá ngắn",
         () => {
@@ -119,7 +125,10 @@ describe("Login Component - Error handling & success messages", () => {
             const btnLogin = screen.getByTestId("login-button");
             fireEvent.change(usernameInput, { target: { value: "aa" } })
             fireEvent.click(btnLogin);
-            expect(global.alert).toHaveBeenCalledWith('Ten dang nhap phai co do dai tu 3-50 ky tu');
+
+            const errorSpan = screen.getByTestId("username-error");
+            expect(errorSpan).toBeInTheDocument();
+            expect(errorSpan.textContent).toBe('Ten dang nhap phai co do dai tu 3-50 ky tu');
         });
     test("Hiển thị thông báo với trường hợp kiểm tra validationUsername thất bại - Trường hợp username quá dài",
         () => {
@@ -132,7 +141,10 @@ describe("Login Component - Error handling & success messages", () => {
                 }
             })
             fireEvent.click(btnLogin);
-            expect(global.alert).toHaveBeenCalledWith('Ten dang nhap phai co do dai tu 3-50 ky tu');
+
+            const errorSpan = screen.getByTestId("username-error");
+            expect(errorSpan).toBeInTheDocument();
+            expect(errorSpan.textContent).toBe('Ten dang nhap phai co do dai tu 3-50 ky tu');
         });
     test("Hiển thị thông báo với trường hợp kiểm tra validationUsername thất bại - Trường hợp username có space",
         () => {
@@ -145,7 +157,10 @@ describe("Login Component - Error handling & success messages", () => {
                 }
             })
             fireEvent.click(btnLogin);
-            expect(global.alert).toHaveBeenCalledWith('Username khong ton tai khoang trang');
+
+            const errorSpan = screen.getByTestId("username-error");
+            expect(errorSpan).toBeInTheDocument();
+            expect(errorSpan.textContent).toBe('Username khong ton tai khoang trang');
         });
 
     // Password
@@ -156,7 +171,10 @@ describe("Login Component - Error handling & success messages", () => {
             const btnLogin = screen.getByTestId("login-button");
             fireEvent.change(usernameInput, { target: { value: "Admin" } });
             fireEvent.click(btnLogin);
-            expect(global.alert).toHaveBeenCalledWith("Password khong duoc de trong");
+
+            const errorSpan = screen.getByTestId("password-error");
+            expect(errorSpan).toBeInTheDocument();
+            expect(errorSpan.textContent).toBe("Password khong duoc de trong");
         });
     test("Hiển thị thông báo với trường hợp kiểm tra validationPassword thất bại - Trường hợp password quá ngắn",
         () => {
@@ -167,7 +185,10 @@ describe("Login Component - Error handling & success messages", () => {
             fireEvent.change(usernameInput, { target: { value: "Admin" } });
             fireEvent.change(passwordInput, { target: { value: "aa" } });
             fireEvent.click(btnLogin);
-            expect(global.alert).toHaveBeenCalledWith("Password co do dai tu 6-100 ky tu");
+
+            const errorSpan = screen.getByTestId("password-error");
+            expect(errorSpan).toBeInTheDocument();
+            expect(errorSpan.textContent).toBe("Password co do dai tu 6-100 ky tu");
         });
     test("Hiển thị thông báo với trường hợp kiểm tra validationPassword thất bại - Trường hợp password quá dài",
         () => {
@@ -183,7 +204,10 @@ describe("Login Component - Error handling & success messages", () => {
                 }
             });
             fireEvent.click(btnLogin);
-            expect(global.alert).toHaveBeenCalledWith("Password co do dai tu 6-100 ky tu");
+
+            const errorSpan = screen.getByTestId("password-error");
+            expect(errorSpan).toBeInTheDocument();
+            expect(errorSpan.textContent).toBe("Password co do dai tu 6-100 ky tu");
         });
     test("Hiển thị thông báo với trường hợp kiểm tra validationPassword thất bại - Trường hợp password chứa space",
         () => {
@@ -198,7 +222,10 @@ describe("Login Component - Error handling & success messages", () => {
                 }
             });
             fireEvent.click(btnLogin);
-            expect(global.alert).toHaveBeenCalledWith("Password khong ton tai khoang trang");
+
+            const errorSpan = screen.getByTestId("password-error");
+            expect(errorSpan).toBeInTheDocument();
+            expect(errorSpan.textContent).toBe("Password khong ton tai khoang trang");
         });
     test("Hiển thị thông báo với trường hợp kiểm tra validationPassword thất bại - Trường hợp password sai định dạng",
         () => {
@@ -213,8 +240,10 @@ describe("Login Component - Error handling & success messages", () => {
                 }
             });
             fireEvent.click(btnLogin);
-            expect(global.alert).toHaveBeenCalledWith('Password khong dung dinh dang, phai co it nhat 1 chu cai hoa, '
-                + '1 chu cai thuong, 1 so, 1 ky tu dac biet');
+
+            const errorSpan = screen.getByTestId("password-error");
+            expect(errorSpan).toBeInTheDocument();
+            expect(errorSpan.textContent).toBe('Password khong dung dinh dang, phai co it nhat 1 chu cai hoa, 1 chu cai thuong, 1 so, 1 ky tu dac biet');
 
         });
 

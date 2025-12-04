@@ -44,8 +44,8 @@ export function validatePassword(password) {
 }
 
 
-    // (?=.*[a-z]) → ít nhất 1 chữ thường
-    // (?=.*[A-Z]) → ít nhất 1 chữ hoa
-    // (?=.*\d) → ít nhất 1 số
-    // (?=.*[!@#$%^&*()_\-+=~])` → ít nhất 1 ký tự đặc biệt
-    // .+ → ít nhất 1 ký tự tổng thể
+// (?=.*[a-z]) → ít nhất 1 chữ thường
+// (?=.*[A-Z]) → ít nhất 1 chữ hoa
+// (?=.*\d) → ít nhất 1 số
+// (?=.*[!@#$%^&*()_\-+=~])` → ít nhất 1 ký tự đặc biệt
+// .+ → ít nhất 1 ký tự tổng thể

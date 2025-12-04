@@ -84,7 +84,7 @@ export default function Login() {
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("authToken", res.token);
         setUsername(res.username);
-        alert("Login thành công");
+        alert("Login thanh cong");
         window.location.href = "/products";
       } else {
         alert(res.message);

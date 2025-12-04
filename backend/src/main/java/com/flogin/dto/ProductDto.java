@@ -26,7 +26,7 @@ public class ProductDto {
     private int quantity;
 
     @NotBlank(message = "Danh mục sản phẩm không được để trống")
-    @Pattern(regexp = "^(electronics|clothing|food|books)$", message = "Danh mục sản phẩm không hợp lệ")
+    @Pattern(regexp = "^(electronics|food|model)$", message = "Danh mục sản phẩm không hợp lệ")
     private String category;
 
     // Constructors

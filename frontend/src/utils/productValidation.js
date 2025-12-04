@@ -10,47 +10,47 @@ export const validateProduct = (product) => {
   const name = product.name?.trim() || "";
 
   if (!name) {
-    errors.name = "Tên sản phẩm không được để trống";
+    errors.name = "Ten san pham khong duoc de trong";
   } else if (name.length < 3 || name.length > 100) {
-    errors.name = "Tên sản phẩm phải từ 3 đến 100 ký tự";
+    errors.name = "Ten san pham phai tu 3 den 100 ky tu";
   } else if (!/^[\p{L}0-9\s\-,.()]+$/u.test(name)) {
-    errors.name = "Tên sản phẩm chứa ký tự không hợp lệ";
+    errors.name = "Ten san pham chua ky tu khong hop le";
   }
 
   // Giá sản phẩm
   const price = Number(product.price);
-  if (!product.price && product.price !== 0) {
-    errors.price = "Giá sản phẩm không được để trống";
+  if (product.price === "" || product.price === null || product.price === undefined) {
+    errors.price = "Gia san pham khong duoc de trong";
   } else if (isNaN(price)) {
-    errors.price = "Giá sản phẩm phải là số";
+    errors.price = "Gia san pham phai la so";
   } else if (price < 1) {
-    errors.price = "Giá sản phẩm phải lớn hơn 0";
+    errors.price = "Gia san pham phai lon hon 0";
   } else if (price > 1000000000) {
-    errors.price = "Giá sản phẩm không được vượt quá 1,000,000,000";
+    errors.price = "Gia san pham khong duoc vuot qua 1,000,000,000";
   }
 
   // Số lượng sản phẩm
   const quantity = Number(product.quantity);
-  if (!product.quantity && product.quantity !== 0) {
-    errors.quantity = "Số lượng sản phẩm không được để trống";
+  if (product.quantity === "" || product.quantity === null || product.quantity === undefined) {
+    errors.quantity = "So luong san pham khong duoc de trong";
   } else if (isNaN(quantity)) {
-    errors.quantity = "Số lượng sản phẩm phải là số";
+    errors.quantity = "So luong san pham phai la so";
   } else if (quantity < 0) {
-    errors.quantity = "Số lượng sản phẩm phải lớn hơn hoặc bằng 0";
+    errors.quantity = "So luong phai lon hon hoac bang 0";
   } else if (quantity > 10000) {
-    errors.quantity = "Số lượng sản phẩm không được vượt quá 10,000";
+    errors.quantity = "So luong san pham khong duoc vuot qua 10,000";
   }
 
   // Danh mục sản phẩm
   if (!product.category) {
-    errors.category = "Danh mục sản phẩm không được để trống";
+    errors.category = "Danh muc khong hop le";
   } else if (!VALID_CATEGORIES.includes(product.category)) {
-    errors.category = "Danh mục sản phẩm không hợp lệ";
+    errors.category = "Danh muc khong hop le";
   }
 
   // Mô tả sản phẩm (optional)
   if (product.description && product.description.length > 500) {
-    errors.description = "Mô tả không được vượt quá 500 ký tự";
+    errors.description = "Mo ta khong duoc vuot qua 500 ky tu";
   }
 
   return errors;

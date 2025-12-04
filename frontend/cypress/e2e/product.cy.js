@@ -23,7 +23,7 @@ describe('Product CRUD Operations - Professional', () => {
             productPage.clickAddNew()
             productPage.fillProductForm(testProduct)
             productPage.submitForm()
-            cy.wait(1000)
+            cy.wait(2000)
 
             productPage.getSuccessMessage()
                 .should('contain', 'thành công')
@@ -56,7 +56,7 @@ describe('Product CRUD Operations - Professional', () => {
             })
             productPage.submitForm()
 
-            productPage.shouldShowFieldError('price', 'Giá sản phẩm phải lớn hơn 0')
+            productPage.shouldShowFieldError('price', 'Gia san pham phai lon hon 0')
             productPage.cancelForm()
         })
 
@@ -71,7 +71,7 @@ describe('Product CRUD Operations - Professional', () => {
             })
             productPage.submitForm()
 
-            productPage.shouldShowFieldError('quantity', 'Số lượng sản phẩm phải lớn hơn hoặc bằng 0')
+            productPage.shouldShowFieldError('quantity', 'So luong phai lon hon hoac bang 0')
             productPage.cancelForm()
         })
     })
@@ -149,7 +149,7 @@ describe('Product CRUD Operations - Professional', () => {
                 }
             })
 
-            productPage.shouldShowFieldError('name', 'Tên sản phẩm không được để trống')
+            productPage.shouldShowFieldError('name', 'Ten san pham khong duoc de trong')
             productPage.cancelForm()
         })
     })
