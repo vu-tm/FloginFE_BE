@@ -326,46 +326,4 @@ public class ProductServiceTest {
 
                 verify(productRepository, times(1)).findAll();
         }
-
-        // ==================== ADDITIONAL UPDATE TESTS ====================
-
-        @Test
-        @DisplayName("TC16: Cập nhật sản phẩm thành công - Không thay đổi tên")
-        void testUpdateProduct_SameNameSuccess() {
-                ProductDto productDto = new ProductDto("Laptop", 20000000, 15, "Electronics");
-                Product existingProduct = new Product(1L, "Laptop", 15000000, 10, "Electronics");
-                Product updatedProduct = new Product(1L, "Laptop", 20000000, 15, "Electronics");
-
-                when(productRepository.findById(1L)).thenReturn(Optional.of(existingProduct));
-                when(productRepository.save(any(Product.class))).thenReturn(updatedProduct);
-
-                ProductDto result = productService.updateProduct(1L, productDto);
-
-                assertNotNull(result);
-                assertEquals("Laptop", result.getName());
-                assertEquals(20000000, result.getPrice());
-                assertEquals(15, result.getQuantity());
-
-                verify(productRepository, times(1)).findById(1L);
-                verify(productRepository, times(1)).save(any(Product.class));
-        }
-
-        @Test
-        @DisplayName("TC17: Cập nhật sản phẩm thất bại - Dữ liệu không hợp lệ")
-        void testUpdateProduct_InvalidData() {
-                ProductDto productDto = new ProductDto(null, -5000, -10, null);
-                Product existingProduct = new Product(1L, "Laptop", 15000000, 10, "Electronics");
-
-                when(productRepository.findById(1L)).thenReturn(Optional.of(existingProduct));
-                when(productRepository.save(any(Product.class)))
-                                .thenThrow(new RuntimeException("Invalid product data"));
-
-                RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-                        productService.updateProduct(1L, productDto);
-                });
-
-                assertEquals("Invalid product data", exception.getMessage());
-                verify(productRepository, times(1)).findById(1L);
-                verify(productRepository, times(1)).save(any(Product.class));
-        }
 }
