@@ -60,7 +60,41 @@ describe('Product CRUD Operations - Professional', () => {
             productPage.cancelForm()
         })
 
-        it('TC4 [Create Validation] - Nên hiển thị lỗi khi nhập số lượng sản phẩm âm', () => {
+        it('TC4 [Create Duplicate Name] - Nên hiển thị lỗi khi tạo sản phẩm với tên trùng lặp', () => {
+            const duplicateName = `Sản phẩm test trùng tên`;
+
+            productPage.clickAddNew()
+            productPage.fillProductForm({
+                name: duplicateName,
+                price: '1000000',
+                quantity: '5',
+                category: 'electronics'
+            })
+            productPage.submitForm()
+            cy.wait(2000)
+
+            // Thử tạo sản phẩm thứ 2 với cùng tên
+            productPage.clickAddNew()
+            productPage.fillProductForm({
+                name: duplicateName,
+                price: '2000000',
+                quantity: '10',
+                category: 'food'
+            })
+            productPage.submitForm()
+            cy.wait(1000)
+
+            // Kiểm tra thông báo lỗi
+            productPage.getErrorMessage()
+                .should('contain', 'Tên sản phẩm đã tồn tại')
+                .and('be.visible')
+
+            // Đảm bảo modal vẫn mở
+            productPage.getModal().should('exist')
+            productPage.cancelForm()
+        })
+
+        it('TC5 [Create Validation] - Nên hiển thị lỗi khi nhập số lượng sản phẩm âm', () => {
             productPage.clickAddNew()
 
             productPage.fillProductForm({
@@ -78,7 +112,7 @@ describe('Product CRUD Operations - Professional', () => {
 
     // === READ OPERATIONS ===  
     describe('Read Product Operations', () => {
-        it('TC5 [Read List] - Nên hiển thị danh sách sản phẩm với đầy đủ thông tin', () => {
+        it('TC6 [Read List] - Nên hiển thị danh sách sản phẩm với đầy đủ thông tin', () => {
             cy.get('table').should('exist')
             cy.contains('th', 'Mã sản phẩm').should('exist')
             cy.contains('th', 'Tên sản phẩm').should('exist')
@@ -88,7 +122,7 @@ describe('Product CRUD Operations - Professional', () => {
             cy.get('[data-testid="product-item"]').should('have.length.at.least', 1)
         })
 
-        it('TC6 [Read Detail] - Nên hiển thị chi tiết sản phẩm khi click xem chi tiết', () => {
+        it('TC7 [Read Detail] - Nên hiển thị chi tiết sản phẩm khi click xem chi tiết', () => {
             productPage.clickViewDetailOnProduct(testProduct.name)
             cy.get('.modal-detail').should('be.visible')
             productPage.closeDetailModal()
@@ -97,7 +131,7 @@ describe('Product CRUD Operations - Professional', () => {
 
     // === UPDATE OPERATIONS ===
     describe('Update Product Operations', () => {
-        it('TC7 [Update Success] - Nên cập nhật sản phẩm thành công khi sửa thông tin hợp lệ', () => {
+        it('TC8 [Update Success] - Nên cập nhật sản phẩm thành công khi sửa thông tin hợp lệ', () => {
             productPage.clickEditOnProduct(testProduct.name)
             productPage.fillProductForm({ price: testProduct.updatedPrice })
             productPage.submitForm()
@@ -113,7 +147,7 @@ describe('Product CRUD Operations - Professional', () => {
                 })
         })
 
-        it('TC8 [Update Cancel] - Nên giữ nguyên thông tin sản phẩm khi hủy cập nhật', () => {
+        it('TC9 [Update Cancel] - Nên giữ nguyên thông tin sản phẩm khi hủy cập nhật', () => {
             productPage.clickEditOnProduct(testProduct.name)
             productPage.fillProductForm({ name: 'Temporary Name' })
             productPage.cancelForm()
@@ -122,7 +156,7 @@ describe('Product CRUD Operations - Professional', () => {
             cy.contains('Temporary Name').should('not.exist')
         })
 
-        it('TC9 [Update Validation] - Nên hiển thị lỗi khi cập nhật với tên sản phẩm trống', () => {
+        it('TC10 [Update Validation] - Nên hiển thị lỗi khi cập nhật với tên sản phẩm trống', () => {
             productPage.clickEditOnProduct(testProduct.name)
 
             // Xóa tên sản phẩm
@@ -137,10 +171,8 @@ describe('Product CRUD Operations - Professional', () => {
             // Thêm wait và debug
             cy.wait(500) // Chờ validation chạy
 
-            // Debug: kiểm tra xem modal còn không
             productPage.getModal().should('exist')
 
-            // Debug: kiểm tra xem có lỗi không
             productPage.getFieldError('name').then(($error) => {
                 if ($error.length === 0) {
                     console.log('No error element found')
@@ -156,14 +188,14 @@ describe('Product CRUD Operations - Professional', () => {
 
     // === DELETE OPERATIONS ===
     describe('Delete Product Operations', () => {
-        it('TC10 [Delete Cancel] - Nên giữ nguyên sản phẩm khi hủy xóa', () => {
+        it('TC11 [Delete Cancel] - Nên giữ nguyên sản phẩm khi hủy xóa', () => {
             productPage.clickDeleteOnProduct(testProduct.name)
             productPage.cancelDelete()
 
             productPage.getProductInList(testProduct.name).should('exist')
         })
 
-        it('TC11 [Delete Success] - Nên xóa sản phẩm thành công khi xác nhận xóa', () => {
+        it('TC12 [Delete Success] - Nên xóa sản phẩm thành công khi xác nhận xóa', () => {
             productPage.clickDeleteOnProduct(testProduct.name)
             productPage.confirmDelete()
             cy.wait(1000)
@@ -177,7 +209,7 @@ describe('Product CRUD Operations - Professional', () => {
 
     // === SEARCH/FILTER OPERATIONS ===
     describe('Search/Filter Operations', () => {
-        it('TC12 [Search Functionality] - Nên tìm kiếm sản phẩm theo tên chính xác', () => {
+        it('TC13 [Search Functionality] - Nên tìm kiếm sản phẩm theo tên chính xác', () => {
             const searchTerm = "Laptop";
             productPage.searchProduct(searchTerm)
 
@@ -190,7 +222,7 @@ describe('Product CRUD Operations - Professional', () => {
             productPage.getSearchResultsCount().should('contain', 'Tìm thấy')
         })
 
-        it('TC13 [Filter by Category] - Nên lọc sản phẩm theo danh mục chính xác', () => {
+        it('TC14 [Filter by Category] - Nên lọc sản phẩm theo danh mục chính xác', () => {
             productPage.filterByCategory('electronics')
             cy.wait(1000)
 
@@ -199,14 +231,14 @@ describe('Product CRUD Operations - Professional', () => {
             })
         })
 
-        it('TC14 [Search No Results] - Nên hiển thị thông báo khi không tìm thấy kết quả tìm kiếm', () => {
+        it('TC15 [Search No Results] - Nên hiển thị thông báo khi không tìm thấy kết quả tìm kiếm', () => {
             productPage.searchProduct('NonexistentProductName12345')
 
             productPage.getNoResultsMessage().should('be.visible')
             productPage.getAllProductItems().should('not.exist')
         })
 
-        it('TC15 [Combined Search and Filter] - Nên kết hợp tìm kiếm và lọc danh mục chính xác', () => {
+        it('TC16 [Combined Search and Filter] - Nên kết hợp tìm kiếm và lọc danh mục chính xác', () => {
             const searchTerm = "Laptop";
             productPage.searchProduct(searchTerm)
             productPage.filterByCategory('electronics')
@@ -221,7 +253,7 @@ describe('Product CRUD Operations - Professional', () => {
             })
         })
 
-        it('TC16 [Clear Search] - Nên hiển thị lại tất cả sản phẩm khi xóa tìm kiếm', () => {
+        it('TC17 [Clear Search] - Nên hiển thị lại tất cả sản phẩm khi xóa tìm kiếm', () => {
             productPage.searchProduct('Laptop')
             productPage.clearSearch()
 
@@ -229,7 +261,7 @@ describe('Product CRUD Operations - Professional', () => {
             cy.contains('Tất cả danh mục').should('be.visible')
         })
 
-        it('TC17 [Filter All Categories] - Nên hiển thị tất cả sản phẩm khi chọn "Tất cả danh mục"', () => {
+        it('TC18 [Filter All Categories] - Nên hiển thị tất cả sản phẩm khi chọn "Tất cả danh mục"', () => {
             productPage.filterByCategory('all')
             cy.wait(1000)
 
@@ -239,7 +271,7 @@ describe('Product CRUD Operations - Professional', () => {
 
     // === EDGE CASES ===
     describe('Edge Cases', () => {
-        it('TC18 [Boundary Value] - Nên tạo sản phẩm thành công khi nhập tên đúng 3 ký tự', () => {
+        it('TC19 [Boundary Value] - Nên tạo sản phẩm thành công khi nhập tên đúng 3 ký tự', () => {
             productPage.clickAddNew()
 
             productPage.fillProductForm({
@@ -255,7 +287,7 @@ describe('Product CRUD Operations - Professional', () => {
             productPage.getProductInList('abc').should('exist')
         })
 
-        it('TC19 [Error Recovery] - Nên tạo sản phẩm thành công sau khi sửa lỗi validation', () => {
+        it('TC20 [Error Recovery] - Nên tạo sản phẩm thành công sau khi sửa lỗi validation', () => {
             productPage.clickAddNew()
 
             // Nhập sai trước
