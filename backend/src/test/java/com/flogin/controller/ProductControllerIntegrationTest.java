@@ -52,8 +52,8 @@ public class ProductControllerIntegrationTest {
         void testGetAllProducts() throws Exception {
                 // GIVEN
                 List<ProductDto> products = Arrays.asList(
-                                new ProductDto("Laptop", 15000000, 10, "Electronics"),
-                                new ProductDto("Mouse", 390000, 40, "Electronics"));
+                                new ProductDto("Laptop", 15000000, 10, "electronics"),
+                                new ProductDto("Mouse", 390000, 40, "electronics"));
 
                 when(productService.getAllProducts()).thenReturn(products);
 
@@ -70,7 +70,7 @@ public class ProductControllerIntegrationTest {
         @DisplayName("GET /api/products/{id} - Lấy sản phẩm theo ID")
         void testGetProductById() throws Exception {
                 // GIVEN
-                ProductDto productDto = new ProductDto(1L, "Laptop", 15000000, 10, "Electronics");
+                ProductDto productDto = new ProductDto(1L, "Laptop", 15000000, 10, "electronics");
 
                 when(productService.getProduct(1L)).thenReturn(productDto);
 
@@ -80,14 +80,14 @@ public class ProductControllerIntegrationTest {
                                 .andExpect(jsonPath("$.name").value("Laptop"))
                                 .andExpect(jsonPath("$.price").value(15000000))
                                 .andExpect(jsonPath("$.quantity").value(10))
-                                .andExpect(jsonPath("$.category").value("Electronics"));
+                                .andExpect(jsonPath("$.category").value("electronics"));
         }
 
         @Test // c
         @DisplayName("POST /api/products - Tạo sản phẩm mới")
         void testCreateProduct() throws Exception {
                 // GIVEN
-                ProductDto product = new ProductDto(1L, "Laptop", 15000000, 10, "Electronics");
+                ProductDto product = new ProductDto(1L, "Laptop", 15000000, 10, "electronics");
 
                 when(productService.createProduct(any(ProductDto.class)))
                                 .thenReturn(product);
@@ -100,7 +100,7 @@ public class ProductControllerIntegrationTest {
                                                         "name": "Laptop",
                                                         "price": 15000000,
                                                         "quantity": 10,
-                                                        "category": "Electronics"
+                                                        "category": "electronics"
                                                     }
                                                 """))
 
@@ -109,14 +109,14 @@ public class ProductControllerIntegrationTest {
                                 .andExpect(jsonPath("$.name").value("Laptop"))
                                 .andExpect(jsonPath("$.price").value(15000000))
                                 .andExpect(jsonPath("$.quantity").value(10))
-                                .andExpect(jsonPath("$.category").value("Electronics"));
+                                .andExpect(jsonPath("$.category").value("electronics"));
         }
 
         @Test // d
         @DisplayName("PUT /api/products/{id} - Cập nhật sản phẩm thành công")
         void testUpdateProduct() throws Exception {
                 // GIVEN
-                ProductDto updatedProduct = new ProductDto(1L, "Laptop Pro", 20000000, 12, "Electronics");
+                ProductDto updatedProduct = new ProductDto(1L, "Laptop Pro", 20000000, 12, "electronics");
 
                 when(productService.updateProduct(eq(1L), any(ProductDto.class)))
                                 .thenReturn(updatedProduct);
@@ -129,7 +129,7 @@ public class ProductControllerIntegrationTest {
                                                     "name": "Laptop Pro",
                                                     "price": 20000000,
                                                     "quantity": 12,
-                                                    "category": "Electronics"
+                                                    "category": "electronics"
                                                 }
                                                 """))
                                 .andExpect(status().isOk())
@@ -137,7 +137,7 @@ public class ProductControllerIntegrationTest {
                                 .andExpect(jsonPath("$.name").value("Laptop Pro"))
                                 .andExpect(jsonPath("$.price").value(20000000))
                                 .andExpect(jsonPath("$.quantity").value(12))
-                                .andExpect(jsonPath("$.category").value("Electronics"));
+                                .andExpect(jsonPath("$.category").value("electronics"));
         }
 
         @Test // e
