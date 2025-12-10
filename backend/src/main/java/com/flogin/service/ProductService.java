@@ -15,17 +15,16 @@ import com.flogin.repository.ProductRepository;
 @Service
 public class ProductService {
 
-    // Không dùng Autowired
-    // Dùng constructor -> private final
     private final ProductRepository productRepository;
 
-    // add constructor
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
     // CREATE - Tạo sản phẩm mới
     public ProductDto createProduct(ProductDto productDto) {
+        validateProductNameNotDuplicate(productDto.getName());
+
         // 1. Tạo entity từ DTO
         Product product = new Product();
         product.setName(productDto.getName());
@@ -52,6 +51,10 @@ public class ProductService {
         // 1. Tìm product cũ
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+        if (!existingProduct.getName().equals(productDto.getName())) {
+            validateProductNameNotDuplicateForUpdate(productDto.getName(), id);
+        }
 
         // 2. Cập nhật thông tin mới
         existingProduct.setName(productDto.getName());
@@ -81,7 +84,7 @@ public class ProductService {
 
         // 2. Chuyển từ entity sang DTO
         return products.stream()
-                .map(this::mapToDto)
+                .map(product -> mapToDto(product))
                 .collect(Collectors.toList());
     }
 
@@ -94,7 +97,7 @@ public class ProductService {
         Page<Product> productPage = productRepository.findAll(pageable);
 
         // 3. Chuyển từ Page<Product> thành Page<ProductDto>
-        return productPage.map(this::mapToDto);
+        return productPage.map(product -> mapToDto(product));
     }
 
     // Helper method chuyển từ Entity sang DTO
@@ -106,5 +109,17 @@ public class ProductService {
         productDto.setQuantity(product.getQuantity());
         productDto.setCategory(product.getCategory());
         return productDto;
+    }
+
+    private void validateProductNameNotDuplicate(String name) {
+        if (productRepository.existsByName(name)) {
+            throw new IllegalArgumentException("Product with name '" + name + "' already exists");
+        }
+    }
+
+    private void validateProductNameNotDuplicateForUpdate(String name, Long excludeId) {
+        if (productRepository.existsByNameAndIdNot(name, excludeId)) {
+            throw new IllegalArgumentException("Product with name '" + name + "' already exists");
+        }
     }
 }

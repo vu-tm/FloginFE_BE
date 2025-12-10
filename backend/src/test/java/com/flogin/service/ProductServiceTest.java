@@ -202,7 +202,7 @@ public class ProductServiceTest {
 
                 assertEquals("Product name already exists", exception.getMessage());
                 verify(productRepository, times(1)).findById(1L);
-                verify(productRepository, times(1)).save(any(Product.class));
+                verify(productRepository, never()).save(any(Product.class));
         }
 
         // ==================== DELETE TESTS ====================
