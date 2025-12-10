@@ -87,8 +87,8 @@ export default function Login() {
         alert(res.message);
       }
     } catch (err) {
-      // alert(err.message);
-      alert("Username/Password không tồn tại");
+      alert(err.message);
+      // alert("Username/Password không tồn tại");
     } finally {
       setIsLoading(false);
     }
