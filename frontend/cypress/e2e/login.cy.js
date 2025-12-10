@@ -25,7 +25,6 @@ describe('Login E2E Tests - Professional', () => {
         loginPage.visit()
     })
 
-    // === TEST COMPLETE LOGIN FLOW (1 điểm) ===
     describe('Complete Login Flow', () => {
         it('TC1 [Login UI] - Nên hiển thị form login đầy đủ', () => {
             // Kiểm tra các elements chính
