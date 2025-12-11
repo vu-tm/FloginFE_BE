@@ -30,8 +30,8 @@ import com.flogin.dto.ProductDto;
 import com.flogin.entity.Product;
 import com.flogin.repository.ProductRepository;
 
-@DisplayName("Product Service Unit Tests")
-public class ProductServiceTest {
+@DisplayName("Product Service Mock Tests")
+public class ProductServiceMockTest {
 
         @Mock
         private ProductRepository productRepository;

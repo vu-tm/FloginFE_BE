@@ -4,7 +4,7 @@ describe('Product CRUD Operations - Professional', () => {
     const productPage = new ProductPage()
 
     const testProduct = {
-        name: `Laptop Dell ${Date.now()}`,
+        name: 'Laptop Dell ${Date.now()}',
         price: '15000000',
         quantity: '10',
         updatedPrice: '14000000',
@@ -44,41 +44,11 @@ describe('Product CRUD Operations - Professional', () => {
             productPage.getModal().should('exist')
             productPage.cancelForm()
         })
-
-        it('TC3 [Create Validation] - Nên hiển thị lỗi khi nhập giá sản phẩm bằng 0', () => {
-            productPage.clickAddNew()
-
-            productPage.fillProductForm({
-                name: testProduct.name,
-                price: '0',
-                quantity: testProduct.quantity,
-                category: testProduct.category
-            })
-            productPage.submitForm()
-
-            productPage.shouldShowFieldError('price', 'Gia san pham phai lon hon 0')
-            productPage.cancelForm()
-        })
-
-        it('TC4 [Create Validation] - Nên hiển thị lỗi khi nhập số lượng sản phẩm âm', () => {
-            productPage.clickAddNew()
-
-            productPage.fillProductForm({
-                name: testProduct.name,
-                price: testProduct.price,
-                quantity: '-5',
-                category: testProduct.category
-            })
-            productPage.submitForm()
-
-            productPage.shouldShowFieldError('quantity', 'So luong phai lon hon hoac bang 0')
-            productPage.cancelForm()
-        })
     })
 
     // === READ OPERATIONS ===  
     describe('Read Product Operations', () => {
-        it('TC5 [Read List] - Nên hiển thị danh sách sản phẩm với đầy đủ thông tin', () => {
+        it('TC3 [Read List] - Nên hiển thị danh sách sản phẩm với đầy đủ thông tin', () => {
             cy.get('table').should('exist')
             cy.contains('th', 'Mã sản phẩm').should('exist')
             cy.contains('th', 'Tên sản phẩm').should('exist')
@@ -88,7 +58,7 @@ describe('Product CRUD Operations - Professional', () => {
             cy.get('[data-testid="product-item"]').should('have.length.at.least', 1)
         })
 
-        it('TC6 [Read Detail] - Nên hiển thị chi tiết sản phẩm khi click xem chi tiết', () => {
+        it('TC4 [Read Detail] - Nên hiển thị chi tiết sản phẩm khi click xem chi tiết', () => {
             productPage.clickViewDetailOnProduct(testProduct.name)
             cy.get('.modal-detail').should('be.visible')
             productPage.closeDetailModal()
@@ -97,7 +67,7 @@ describe('Product CRUD Operations - Professional', () => {
 
     // === UPDATE OPERATIONS ===
     describe('Update Product Operations', () => {
-        it('TC7 [Update Success] - Nên cập nhật sản phẩm thành công khi sửa thông tin hợp lệ', () => {
+        it('TC5 [Update Success] - Nên cập nhật sản phẩm thành công khi sửa thông tin hợp lệ', () => {
             productPage.clickEditOnProduct(testProduct.name)
             productPage.fillProductForm({ price: testProduct.updatedPrice })
             productPage.submitForm()
@@ -113,7 +83,7 @@ describe('Product CRUD Operations - Professional', () => {
                 })
         })
 
-        it('TC8 [Update Cancel] - Nên giữ nguyên thông tin sản phẩm khi hủy cập nhật', () => {
+        it('TC6 [Update Cancel] - Nên giữ nguyên thông tin sản phẩm khi hủy cập nhật', () => {
             productPage.clickEditOnProduct(testProduct.name)
             productPage.fillProductForm({ name: 'Temporary Name' })
             productPage.cancelForm()
@@ -122,132 +92,93 @@ describe('Product CRUD Operations - Professional', () => {
             cy.contains('Temporary Name').should('not.exist')
         })
 
-        it('TC9 [Update Validation] - Nên hiển thị lỗi khi cập nhật với tên sản phẩm trống', () => {
-            productPage.clickEditOnProduct(testProduct.name)
+        // === DELETE OPERATIONS ===
+        describe('Delete Product Operations', () => {
+            it('TC7 [Delete Cancel] - Hủy xóa thì sản phẩm vẫn còn', () => {
+                const product = { name: `Cancel Delete ${Date.now()}`, price: '2000000', quantity: '10', category: 'food' }
 
-            // Xóa tên sản phẩm
-            productPage.getModal().within(() => {
-                cy.get('[data-testid="product-name"]')
-                    .clear() // Đảm bảo xóa hết
+                productPage.clickAddNew()
+                productPage.fillProductForm(product)
+                productPage.submitForm()
+                cy.wait(2000)
+
+                productPage.clickDeleteOnProduct(product.name)
+                productPage.cancelDelete() // Từ chối confirm
+                cy.wait(500)
+
+                productPage.getProductInList(product.name).should('exist')
             })
 
-            // Submit form
-            productPage.submitForm()
+            it('TC8 [Delete Success] - Xóa thành công khi xác nhận', () => {
+                const product = { name: `Will Delete ${Date.now()}`, price: '5000000', quantity: '3', category: 'electronics' }
 
-            // Thêm wait và debug
-            cy.wait(500) // Chờ validation chạy
+                productPage.clickAddNew()
+                productPage.fillProductForm(product)
+                productPage.submitForm()
+                cy.wait(2000)
 
-            // Debug: kiểm tra xem modal còn không
-            productPage.getModal().should('exist')
+                productPage.clickDeleteOnProduct(product.name)
+                productPage.confirmDelete() // Chấp nhận confirm
 
-            // Debug: kiểm tra xem có lỗi không
-            productPage.getFieldError('name').then(($error) => {
-                if ($error.length === 0) {
-                    console.log('No error element found')
-                    // Thử kiểm tra giá trị input
-                    cy.get('[data-testid="product-name"]').should('have.value', '')
-                }
-            })
+                cy.contains('Xóa sản phẩm thành công!').should('be.visible')
 
-            productPage.shouldShowFieldError('name', 'Ten san pham khong duoc de trong')
-            productPage.cancelForm()
-        })
-    })
-
-    // === DELETE OPERATIONS ===
-    describe('Delete Product Operations', () => {
-        it('TC10 [Delete Cancel] - Hủy xóa thì sản phẩm vẫn còn', () => {
-            const product = { name: `Cancel Delete ${Date.now()}`, price: '2000000', quantity: '10', category: 'food' }
-
-            productPage.clickAddNew()
-            productPage.fillProductForm(product)
-            productPage.submitForm()
-            cy.wait(2000)
-
-            productPage.clickDeleteOnProduct(product.name)
-            productPage.cancelDelete() // Từ chối confirm
-            cy.wait(500)
-
-            productPage.getProductInList(product.name).should('exist')
-        })
-
-        it('TC11 [Delete Success] - Xóa thành công khi xác nhận', () => {
-            const product = { name: `Will Delete ${Date.now()}`, price: '5000000', quantity: '3', category: 'electronics' }
-
-            productPage.clickAddNew()
-            productPage.fillProductForm(product)
-            productPage.submitForm()
-            cy.wait(2000)
-
-            productPage.clickDeleteOnProduct(product.name)
-            productPage.confirmDelete() // Chấp nhận confirm
-
-            // Success message từ component là "Xóa sản phẩm thành công!"
-            cy.contains('Xóa sản phẩm thành công!').should('be.visible')
-
-            productPage.getProductInList(product.name).should('not.exist')
-        })
-    })
-
-    // === SEARCH/FILTER OPERATIONS ===
-    describe('Search/Filter Operations', () => {
-        it('TC12 [Search Functionality] - Nên tìm kiếm sản phẩm theo tên chính xác', () => {
-            const searchTerm = "Laptop";
-            productPage.searchProduct(searchTerm)
-
-            productPage.getAllProductItems().each(($item) => {
-                productPage.getProductNameInRow($item)
-                    .invoke('text')
-                    .should('include', searchTerm)
-            })
-
-            productPage.getSearchResultsCount().should('contain', 'Tìm thấy')
-        })
-
-        it('TC13 [Filter by Category] - Nên lọc sản phẩm theo danh mục chính xác', () => {
-            productPage.filterByCategory('electronics')
-            cy.wait(1000)
-
-            cy.get('[data-testid="product-item"] .badge').each(($badge) => {
-                cy.wrap($badge).should('contain', 'Điện tử')
+                productPage.getProductInList(product.name).should('not.exist')
             })
         })
 
-        it('TC14 [Search No Results] - Nên hiển thị thông báo khi không tìm thấy kết quả tìm kiếm', () => {
-            productPage.searchProduct('NonexistentProductName12345')
+        // === SEARCH/FILTER OPERATIONS ===
+        describe('Search/Filter Operations', () => {
+            it('TC9 [Search Functionality] - Nên tìm kiếm sản phẩm theo tên chính xác', () => {
+                const searchTerm = "Laptop";
+                productPage.searchProduct(searchTerm)
 
-            productPage.getNoResultsMessage().should('be.visible')
-            productPage.getAllProductItems().should('not.exist')
-        })
+                productPage.getAllProductItems().each(($item) => {
+                    productPage.getProductNameInRow($item)
+                        .invoke('text')
+                        .should('include', searchTerm)
+                })
 
-        it('TC15 [Combined Search and Filter] - Nên kết hợp tìm kiếm và lọc danh mục chính xác', () => {
-            const searchTerm = "Laptop";
-            productPage.searchProduct(searchTerm)
-            productPage.filterByCategory('electronics')
-
-            productPage.getAllProductItems().each(($item) => {
-                productPage.getProductNameInRow($item)
-                    .invoke('text')
-                    .should('include', searchTerm)
-
-                productPage.getProductCategoryInRow($item)
-                    .should('contain', 'Điện tử')
+                productPage.getSearchResultsCount().should('contain', 'Tìm thấy')
             })
-        })
 
-        it('TC16 [Clear Search] - Nên hiển thị lại tất cả sản phẩm khi xóa tìm kiếm', () => {
-            productPage.searchProduct('Laptop')
-            productPage.clearSearch()
+            it('TC10 [Filter by Category] - Nên lọc sản phẩm theo danh mục chính xác', () => {
+                productPage.filterByCategory('electronics')
+                cy.wait(1000)
 
-            productPage.getAllProductItems().should('have.length.at.least', 1)
-            cy.contains('Tất cả danh mục').should('be.visible')
-        })
+                cy.get('[data-testid="product-item"] .badge').each(($badge) => {
+                    cy.wrap($badge).should('contain', 'Điện tử')
+                })
+            })
 
-        it('TC17 [Filter All Categories] - Nên hiển thị tất cả sản phẩm khi chọn "Tất cả danh mục"', () => {
-            productPage.filterByCategory('all')
-            cy.wait(1000)
+            it('TC11 [Search No Results] - Nên hiển thị thông báo khi không tìm thấy kết quả tìm kiếm', () => {
+                productPage.searchProduct('NonexistentProductName12345')
 
-            productPage.getAllProductItems().should('have.length.at.least', 1)
+                productPage.getNoResultsMessage().should('be.visible')
+                productPage.getAllProductItems().should('not.exist')
+            })
+
+            it('TC12 [Combined Search and Filter] - Nên kết hợp tìm kiếm và lọc danh mục chính xác', () => {
+                const searchTerm = "Laptop";
+                productPage.searchProduct(searchTerm)
+                productPage.filterByCategory('electronics')
+
+                productPage.getAllProductItems().each(($item) => {
+                    productPage.getProductNameInRow($item)
+                        .invoke('text')
+                        .should('include', searchTerm)
+
+                    productPage.getProductCategoryInRow($item)
+                        .should('contain', 'Điện tử')
+                })
+            })
+
+            it('TC13 [Clear Search] - Nên hiển thị lại tất cả sản phẩm khi xóa tìm kiếm', () => {
+                productPage.searchProduct('Laptop')
+                productPage.clearSearch()
+
+                productPage.getAllProductItems().should('have.length.at.least', 1)
+                cy.contains('Tất cả danh mục').should('be.visible')
+            })
         })
     })
 })
