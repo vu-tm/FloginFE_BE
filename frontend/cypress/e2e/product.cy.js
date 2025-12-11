@@ -4,7 +4,7 @@ describe('Product CRUD Operations - Professional', () => {
     const productPage = new ProductPage()
 
     const testProduct = {
-        name: 'Laptop Dell ${Date.now()}',
+        name: `Laptop Dell ${Date.now()}`,
         price: '15000000',
         quantity: '10',
         updatedPrice: '14000000',

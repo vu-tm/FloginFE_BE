@@ -1,6 +1,7 @@
 package com.flogin.dto;
 
 public class LoginRequest {
+
     private String username;
     private String password;
 
