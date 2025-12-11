@@ -18,7 +18,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Validate real-time khi người dùng nhập
   const handleUsernameChange = (e) => {
     const value = e.target.value;
     setUsername(value);
@@ -55,8 +54,6 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    // Mark all fields as touched khi submit
     setTouched({
       username: true,
       password: true
@@ -91,6 +88,7 @@ export default function Login() {
       }
     } catch (err) {
       alert(err.message);
+      // alert("Username/Password không tồn tại");
     } finally {
       setIsLoading(false);
     }
