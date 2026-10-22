@@ -37,14 +37,22 @@ public class SecurityConfig {
 
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:3000")); // frontend origin
+
+                    config.setAllowedOrigins(List.of(
+                        "http://localhost:3000",
+                        "https://flogin-frontend.onrender.com"
+                    ));
+
                     config.setAllowedHeaders(List.of("*"));
-                    String path = request.getRequestURI();
-                    if (path.startsWith("/api/login")) {
-                        config.setAllowedMethods(List.of("POST"));
-                    } else {
-                        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-                    }
+
+                    config.setAllowedMethods(List.of(
+                        "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
+                    ));
+
+                    // JWT được gửi qua Authorization header,
+                    // không sử dụng cookie xác thực.
+                    config.setAllowCredentials(false);
+
                     return config;
                     //Khong su dung cookie de luu token, khong can setAllowCredentials(true)
                 }))
@@ -68,7 +76,7 @@ public class SecurityConfig {
                                                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
                                                 "img-src 'self' data: https:; " +
                                                 "font-src 'self' https://fonts.gstatic.com; " +
-                                                "connect-src 'self' http://localhost:8080 ws://localhost:8080; " +
+                                                "connect-src 'self' https://floginfe-be-4tnt.onrender.com http://localhost:8080 ws://localhost:8080; " +
                                                 "frame-ancestors 'none'; " +
                                                 "base-uri 'self'; " +
                                                 "form-action 'self'; " +
