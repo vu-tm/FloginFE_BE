@@ -102,10 +102,13 @@ describe('Product CRUD Operations - Professional', () => {
                 productPage.submitForm()
                 cy.wait(2000)
 
-                productPage.clickDeleteOnProduct(product.name)
                 productPage.cancelDelete() // Từ chối confirm
+                productPage.clickDeleteOnProduct(product.name)
+                cy.get('@cancelDelete').should('have.been.calledOnce')
                 cy.wait(500)
 
+                productPage.getProductInList(product.name).should('exist')
+                cy.reload()
                 productPage.getProductInList(product.name).should('exist')
             })
 
@@ -117,8 +120,9 @@ describe('Product CRUD Operations - Professional', () => {
                 productPage.submitForm()
                 cy.wait(2000)
 
-                productPage.clickDeleteOnProduct(product.name)
                 productPage.confirmDelete() // Chấp nhận confirm
+                productPage.clickDeleteOnProduct(product.name)
+                cy.get('@confirmDelete').should('have.been.calledOnce')
 
                 cy.contains('Xóa sản phẩm thành công!').should('be.visible')
 

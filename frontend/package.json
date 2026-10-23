@@ -33,7 +33,9 @@
     "test:productFormIntegrationFrontend": "react-scripts test --watchAll=false src/tests/ProductForm.integration.test.js",
     "test:productListIntegrationFrontend": "react-scripts test --watchAll=false src/tests/ProductList.integration.test.js",
     "test:productMockFrontend": "react-scripts test --watchAll=false src/tests/Product.mock.test.js",
-    "test:e2eFrontendProduct": "cypress run --spec cypress/e2e/product.cy.js"
+    "test:e2eFrontendProduct": "cypress run --spec cypress/e2e/product.cy.js",
+    "e2e:run": "cypress run --config baseUrl=https://flogin-frontend.onrender.com,defaultCommandTimeout=10000,responseTimeout=120000,pageLoadTimeout=120000 --spec cypress/e2e/login.cy.js,cypress/e2e/product.cy.js",
+    "e2e:open": "cypress open --config baseUrl=https://flogin-frontend.onrender.com,defaultCommandTimeout=10000,responseTimeout=120000,pageLoadTimeout=120000"
   },
   "browserslist": {
     "production": [

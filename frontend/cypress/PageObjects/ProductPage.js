@@ -101,10 +101,14 @@ class ProductPage {
         cy.get('.btn-close-detail').click()
     }
     confirmDelete() {
-        cy.on('window:confirm', () => true)
+        cy.window().then(win => {
+            cy.stub(win, 'confirm').returns(true).as('confirmDelete')
+        })
     }
     cancelDelete() {
-        cy.on('window:confirm', () => false)
+        cy.window().then(win => {
+            cy.stub(win, 'confirm').returns(false).as('cancelDelete')
+        })
     }
     // --- Helper methods ---
     getProductInList(name) {

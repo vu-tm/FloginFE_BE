@@ -15,3 +15,12 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
+
+// Handle native dialogs only inside the test browser, including after redirects.
+beforeEach(() => {
+  const alert = cy.stub().as('alert')
+  cy.on('window:before:load', win => {
+    win.alert = alert
+    win.confirm = () => true
+  })
+})

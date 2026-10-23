@@ -1,0 +1,7 @@
+.cache/
+frontend/cypress/screenshots/
+frontend/cypress/videos/
+frontend/cypress/reports/
+
+*-output.log
+debug.log

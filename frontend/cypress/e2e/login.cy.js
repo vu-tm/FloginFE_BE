@@ -22,6 +22,7 @@ describe('Login E2E Tests - Professional', () => {
     }
 
     beforeEach(() => {
+        cy.intercept('POST', '**/api/login').as('loginRequest')
         loginPage.visit()
     })
 
@@ -51,27 +52,25 @@ describe('Login E2E Tests - Professional', () => {
             cy.wait(1000)
 
             // Kiểm tra thông báo thành công
-            cy.on('window:alert', (text) => {
-                expect(text).to.contains('Login thanh cong')
-            })
+            cy.wait('@loginRequest').its('response.statusCode').should('eq', 200)
+            cy.get('@alert').should('have.been.calledWith', 'Login thanh cong')
 
             // Kiểm tra chuyển hướng
             loginPage.verifyRedirectToDashboard()
 
             // Kiểm tra localStorage
-            cy.window().then((win) => {
+            cy.window().should((win) => {
                 expect(win.localStorage.getItem('isLoggedIn')).to.eq('true')
                 expect(win.localStorage.getItem('authToken')).to.exist
             })
         })
 
         it('TC3 [Login Error] - Nên hiển thị lỗi với credentials không hợp lệ', () => {
-            loginPage.login('wronguser', 'wrongpass')
+            loginPage.login('wronguser', 'Wrong@123')
+            cy.wait('@loginRequest').its('response.statusCode').should('eq', 400)
             cy.wait(500)
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.not.contains('Login thanh cong')
-            })
+            cy.get('@alert').should('have.been.called')
 
             // Không chuyển trang
             cy.url().should('not.include', '/products')
@@ -84,91 +83,71 @@ describe('Login E2E Tests - Professional', () => {
             loginPage.fillLoginForm('', validCredentials.password)
             loginPage.clickLogin()
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.eq('Ten dang nhap khong duoc de trong')
-            })
+            cy.get('[data-testid="username-error"], [data-testid="password-error"]').should('contain', 'Ten dang nhap khong duoc de trong')
         })
 
         it('TC5 [Username Too Short] - Nên hiển thị lỗi khi username quá ngắn', () => {
             loginPage.fillLoginForm(invalidCredentials.shortUsername, validCredentials.password)
             loginPage.clickLogin()
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.eq('Ten dang nhap phai co do dai tu 3-50 ky tu')
-            })
+            cy.get('[data-testid="username-error"], [data-testid="password-error"]').should('contain', 'Ten dang nhap phai co do dai tu 3-50 ky tu')
         })
 
         it('TC6 [Username Too Long] - Nên hiển thị lỗi khi username quá dài', () => {
             loginPage.fillLoginForm(invalidCredentials.longUsername, validCredentials.password)
             loginPage.clickLogin()
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.eq('Ten dang nhap phai co do dai tu 3-50 ky tu')
-            })
+            cy.get('[data-testid="username-error"], [data-testid="password-error"]').should('contain', 'Ten dang nhap phai co do dai tu 3-50 ky tu')
         })
 
         it('TC7 [Username Special Chars] - Nên hiển thị lỗi khi username có ký tự đặc biệt', () => {
             loginPage.fillLoginForm(invalidCredentials.specialCharUsername, validCredentials.password)
             loginPage.clickLogin()
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.eq('Username chi chua cac ky tu a-z, A-Z, 0-9 và "_"')
-            })
+            cy.get('[data-testid="username-error"], [data-testid="password-error"]').should('contain', 'Username chi chua cac ky tu a-z, A-Z, 0-9 và "_"')
         })
 
         it('TC8 [Username With Space] - Nên hiển thị lỗi khi username có khoảng trắng', () => {
             loginPage.fillLoginForm(invalidCredentials.spaceUsername, validCredentials.password)
             loginPage.clickLogin()
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.eq('Username khong ton tai khoang trang')
-            })
+            cy.get('[data-testid="username-error"], [data-testid="password-error"]').should('contain', 'Username khong ton tai khoang trang')
         })
 
         it('TC9 [Password Empty] - Nên hiển thị lỗi khi password trống', () => {
             loginPage.fillLoginForm(validCredentials.username, '')
             loginPage.clickLogin()
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.eq('Password khong duoc de trong')
-            })
+            cy.get('[data-testid="username-error"], [data-testid="password-error"]').should('contain', 'Password khong duoc de trong')
         })
 
         it('TC10 [Password Too Short] - Nên hiển thị lỗi khi password quá ngắn', () => {
             loginPage.fillLoginForm(validCredentials.username, invalidCredentials.shortPassword)
             loginPage.clickLogin()
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.eq('Password co do dai tu 6-100 ky tu')
-            })
+            cy.get('[data-testid="username-error"], [data-testid="password-error"]').should('contain', 'Password co do dai tu 6-100 ky tu')
         })
 
         it('TC11 [Password Too Long] - Nên hiển thị lỗi khi password quá dài', () => {
             loginPage.fillLoginForm(validCredentials.username, invalidCredentials.longPassword)
             loginPage.clickLogin()
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.eq('Password co do dai tu 6-100 ky tu')
-            })
+            cy.get('[data-testid="username-error"], [data-testid="password-error"]').should('contain', 'Password co do dai tu 6-100 ky tu')
         })
 
         it('TC12 [Password With Space] - Nên hiển thị lỗi khi password có khoảng trắng', () => {
             loginPage.fillLoginForm(validCredentials.username, invalidCredentials.spacePassword)
             loginPage.clickLogin()
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.eq('Password khong ton tai khoang trang')
-            })
+            cy.get('[data-testid="username-error"], [data-testid="password-error"]').should('contain', 'Password khong ton tai khoang trang')
         })
 
         it('TC13 [Password Weak Format] - Nên hiển thị lỗi khi password không đúng định dạng', () => {
             loginPage.fillLoginForm(validCredentials.username, invalidCredentials.weakPassword)
             loginPage.clickLogin()
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.eq('Password khong dung dinh dang, phai co it nhat 1 chu cai hoa, ' +
+            cy.get('[data-testid="username-error"], [data-testid="password-error"]').should('contain', 'Password khong dung dinh dang, phai co it nhat 1 chu cai hoa, ' +
                     '1 chu cai thuong, 1 so, 1 ky tu dac biet')
-            })
         })
     })
 
@@ -176,7 +155,8 @@ describe('Login E2E Tests - Professional', () => {
     describe('Success/Error Flows', () => {
         it('TC14 [Multiple Login Attempts] - Nên xử lý nhiều lần đăng nhập', () => {
             // Lần 1: Thất bại
-            loginPage.login('wronguser', 'wrongpass')
+            loginPage.login('wronguser', 'Wrong@123')
+            cy.wait('@loginRequest').its('response.statusCode').should('eq', 400)
             cy.wait(500)
             cy.url().should('not.include', '/products')
 
@@ -192,7 +172,7 @@ describe('Login E2E Tests - Professional', () => {
             cy.wait(1000)
 
             // Kiểm tra localStorage được set
-            cy.window().then((win) => {
+            cy.window().should((win) => {
                 const isLoggedIn = win.localStorage.getItem('isLoggedIn')
                 const authToken = win.localStorage.getItem('authToken')
 
@@ -283,9 +263,7 @@ describe('Login E2E Tests - Professional', () => {
             loginPage.fillPassword(validCredentials.password)
             loginPage.clickLogin()
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.eq('Username khong ton tai khoang trang')
-            })
+            cy.get('[data-testid="username-error"], [data-testid="password-error"]').should('contain', 'Username khong ton tai khoang trang')
         })
     })
 
@@ -294,9 +272,7 @@ describe('Login E2E Tests - Professional', () => {
         it('TC23 [Empty Form Submit] - Nên báo lỗi khi submit form trống', () => {
             loginPage.clickLogin()
 
-            cy.on('window:alert', (text) => {
-                expect(text).to.eq('Ten dang nhap khong duoc de trong')
-            })
+            cy.get('[data-testid="username-error"], [data-testid="password-error"]').should('contain', 'Ten dang nhap khong duoc de trong')
         })
 
         it('TC24 [Special Characters in Password] - Nên chấp nhận ký tự đặc biệt trong password', () => {
@@ -310,6 +286,7 @@ describe('Login E2E Tests - Professional', () => {
         it('TC25 [Case Sensitivity] - Username nên phân biệt hoa thường', () => {
             loginPage.fillLoginForm('TESTUSER', validCredentials.password)
             loginPage.clickLogin()
+            cy.wait('@loginRequest').its('response.statusCode').should('eq', 400)
             cy.wait(500)
 
             // Nếu backend phân biệt hoa thường thì sẽ lỗi
