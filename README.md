@@ -67,3 +67,21 @@ Mở giao diện Cypress:
 ```bash
 npm run e2e:open
 ```
+
+### Chạy local
+
+Mở 3 terminal từ thư mục gốc dự án; giữ backend và frontend chạy:
+
+```powershell
+# Terminal 1: Backend
+cd backend
+mvn spring-boot:run
+
+# Terminal 2: Frontend
+cd frontend
+npm start
+
+# Terminal 3: E2E
+cd frontend
+npx cypress run
+```

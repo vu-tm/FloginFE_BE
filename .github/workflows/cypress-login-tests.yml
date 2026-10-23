@@ -2,9 +2,9 @@ name: Frontend Login Tests CI
 
 on:
   push:
-    branches: ["main", "feat/setup-test"]
+    branches: ["main"]
   pull_request:
-    branches: ["main", "feat/setup-test"]
+    branches: ["main"]
 
 jobs:
   test-frontend:

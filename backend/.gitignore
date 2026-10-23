@@ -32,4 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 
-/backend/flogindb.mv.db
+/flogindb.mv.db

@@ -2,13 +2,13 @@ name: Complete CI/CD Pipeline
 
 on:
   push:
-    branches: ["main", "feat/setup-test"]
+    branches: ["main"]
   pull_request:
-    branches: ["main", "feat/setup-test"]
+    branches: ["main"]
 
 jobs:
   run-product-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest #ubuntu-github
 
     steps:
       - name: Checkout code
@@ -28,14 +28,14 @@ jobs:
           mvn spring-boot:run &
           sleep 10
 
-      - name: Install dependencies
+      - name: Install Frontend dependencies
         working-directory: ./frontend
         run: npm ci
 
        # 1) Validation Test (product)
       - name: Run Product Validation Tests
         working-directory: ./frontend
-        run: npm run test:productValidationFrontend
+        run: npm run test:productValidationFrontend #package.json
 
       # 2) Integration Test
       - name: Run ProductList Integration Tests
