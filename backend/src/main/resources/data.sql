@@ -1,1 +1,1 @@
-MERGE INTO users KEY(username) VALUES ('testuser', 'testuser@example.com', '$2a$10$YY1aK.Q1UdhADjR2eNjYne3GEiRf.g1TM8xqAh0XpYZvD5yU5x1F2');
+MERGE INTO users (username, email, password) KEY(username) VALUES ('testuser', 'testuser@example.com', '$2a$10$YY1aK.Q1UdhADjR2eNjYne3GEiRf.g1TM8xqAh0XpYZvD5yU5x1F2');

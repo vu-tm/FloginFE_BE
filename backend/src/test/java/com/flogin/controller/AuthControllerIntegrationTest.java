@@ -265,16 +265,16 @@ public class AuthControllerIntegrationTest {
                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, ALLOWED_ORIGIN))
-                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "POST"))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "GET,POST,PUT,DELETE,OPTIONS,PATCH"))
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type"));
     }
 
     @Test
-    @DisplayName("CORS Test Preflight AllowedOrigin voi method khac POST")
+    @DisplayName("CORS Test Preflight AllowedOrigin voi method TRACE khong duoc phep")
     void testPreflightAllowedOriginNotAllowedMethods() throws Exception {
        mockMvc.perform(options("/api/login")
                 .header(HttpHeaders.ORIGIN, ALLOWED_ORIGIN)
-                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET")
+                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "TRACE")
                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type"))
                 .andExpect(status().isForbidden());
     }
