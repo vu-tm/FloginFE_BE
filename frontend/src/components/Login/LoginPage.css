@@ -1,3 +1,4 @@
+/* Login visual overrides are scoped at the end of this file. */
 body,
 html {
     height: 100%;
@@ -256,3 +257,66 @@ html {
         transform: translateY(0);
     }
 }
+
+/* Keep the existing form behavior and test selectors. */
+.login-container {
+    box-sizing: border-box;
+    background: #fff;
+    padding: 42px 24px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.login-container .login-wrapper { width: 100%; max-width: 460px; }
+.login-container .login-title {
+    margin: 0;
+    color: #363636;
+    font-size: clamp(28px, 7vw, 44px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -1.5px;
+}
+.login-container .login-brand-accent { color: #3065d8; }
+.login-container .login-subtitle {
+    margin: 12px 0 0;
+    color: #737780;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 24px;
+    letter-spacing: 1px;
+}
+.login-container .login-form { margin-top: 58px; gap: 30px; }
+.login-container .input-group { margin: 0; }
+.login-container .input {
+    height: 54px;
+    padding: 0 20px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    background: #edf0f7;
+    color: #363636;
+    font: inherit;
+    font-size: 20px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.login-container .input::placeholder { color: #737b88; opacity: 1; }
+.login-container .input:focus {
+    border-color: #3065d8;
+    box-shadow: 0 0 0 3px rgba(48, 101, 216, 0.12);
+}
+.login-container .password-wrapper .input { padding-right: 52px; }
+.login-container .password-toggle { top: 27px; right: 14px; width: 30px; height: 30px; }
+.login-container .error-text { position: static; margin-top: 6px; line-height: 20px; }
+.login-container .btn-primary {
+    height: 64px;
+    margin-top: 20px;
+    border-radius: 5px;
+    background: #3065d8;
+    box-shadow: 0 4px 16px rgba(40, 75, 145, 0.22);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    gap: 10px;
+}
+.login-container .btn-primary:hover { background: #2557c2; }
+.login-container .btn-primary:disabled { background: #93b4ed; }
+.login-container .login-icon-submit { margin: 0; color: #a9c5ff; stroke-width: 3; }
+.login-container button:focus-visible { outline: 3px solid #8eb4ff; outline-offset: 3px; }

@@ -105,7 +105,8 @@ export default function Login() {
     <div className="login-container">
       <div className="login-wrapper">
         <div className="login-header">
-          <h2 className="login-title">Sign in to your account</h2>
+          <h2 className="login-title">Elec<span className="login-brand-accent">Store</span></h2>
+          <p className="login-subtitle">ĐĂNG NHẬP</p>
         </div>
 
         <form className="login-form" onSubmit={handleLogin}>
